@@ -12,8 +12,11 @@ import (
 func (m *Menu) Draw(screen *ebiten.Image) {
 	shakeX, shakeY := m.getScreenShake()
 
-	// LevelComplete and GameOver draw only overlay on top of game
-	if m.state == StateLevelComplete || m.state == StateGameOver {
+	isInGameOverlay := m.state == StateLevelComplete || m.state == StateGameOver ||
+		m.state == StatePaused || m.state == StateConfirmRestart ||
+		(m.state == StateSettings && m.previousState == StatePaused)
+
+	if isInGameOverlay {
 		m.drawDarkOverlay(screen)
 		m.drawStateContent(screen, shakeX, shakeY)
 		if m.activeDialog != nil {
@@ -22,7 +25,6 @@ func (m *Menu) Draw(screen *ebiten.Image) {
 		return
 	}
 
-	// Full menu background for other states
 	screen.Fill(colorBgDark)
 
 	m.drawFallingObjects(screen, shakeX, shakeY)
@@ -75,7 +77,9 @@ func (m *Menu) drawStateContent(screen *ebiten.Image, shakeX, shakeY float64) {
 		m.drawMenuItems(screen, m.items, 120, shakeX, shakeY)
 	case StatePaused:
 		m.drawPauseOverlay(screen)
-		m.drawMenuItems(screen, m.pauseItems, 105, shakeX, shakeY)
+		// Menu starts 20px after title, title is at (ScreenHeight-120)/2 = 60
+		menuStartY := (float64(ScreenHeight)-120)/2 + 20
+		m.drawMenuItems(screen, m.pauseItems, menuStartY, shakeX, shakeY)
 	case StateConfirmRestart:
 		m.drawPauseOverlay(screen)
 		m.drawConfirmDialog(screen, shakeX, shakeY)
@@ -277,9 +281,9 @@ func (m *Menu) drawDarkOverlay(screen *ebiten.Image) {
 }
 
 func (m *Menu) drawPauseOverlay(screen *ebiten.Image) {
-	m.drawDarkOverlay(screen)
 	centerX := float64(ScreenWidth) / 2
-	m.drawText(screen, "PAUSED", centerX, 85, m.fontMedium, colorBloodRed, true)
+	titleY := (float64(ScreenHeight) - 120) / 2
+	m.drawText(screen, "PAUSED", centerX, titleY, m.fontMedium, colorBloodRed, true)
 }
 
 func (m *Menu) drawConfirmDialog(screen *ebiten.Image, shakeX, shakeY float64) {

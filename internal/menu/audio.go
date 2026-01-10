@@ -39,8 +39,10 @@ func (m *Menu) updateMusicState() {
 
 func (m *Menu) shouldPlayMusic() bool {
 	switch m.state {
-	case StateMenu, StatePaused, StateConfirmRestart, StateSettings, StateLevelComplete, StateGameOver:
+	case StateMenu:
 		return true
+	case StateSettings:
+		return m.previousState == StateMenu
 	default:
 		return false
 	}
