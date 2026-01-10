@@ -21,6 +21,8 @@ const (
 func LoadPhysicsTestLevel() *ecs.World {
 	w := ecs.NewWorld()
 
+	CreateAudioManager(w)
+
 	CreateStartPoint(w, 50, 300)
 	playerID := CreateCharacter(w, 50, 300, 0.5)
 

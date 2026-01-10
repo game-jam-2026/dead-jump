@@ -15,20 +15,29 @@ import (
 	"github.com/game-jam-2026/dead-jump/pkg/linalg"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/solarlune/resolv"
 )
 
-//go:embed static/hero.png
+//go:embed img/hero.png
 var HeroPNG []byte
 
-//go:embed static/dead_hero.png
+//go:embed img/dead_hero.png
 var DeadHeroPNG []byte
 
-//go:embed static/spike.png
+//go:embed img/spike.png
 var SpikePNG []byte
 
-//go:embed static/wall.png
+//go:embed img/wall.png
 var WallPNG []byte
+
+//go:embed sfx/spikeDeath1.mp3
+var SpikeDeath1MP3 []byte
+
+//go:embed sfx/spikeDeath2.mp3
+var SpikeDeath2MP3 []byte
+
+var SpikeDeathSounds = [][]byte{SpikeDeath1MP3, SpikeDeath2MP3}
 
 var (
 	HeroImage     *ebiten.Image
@@ -143,6 +152,13 @@ func CreateWall(w *ecs.World, x, y, width, height float64) ecs.EntityID {
 		Shape: resolv.NewRectangleFromTopLeft(x, y, width, height),
 	})
 
+	return entity
+}
+
+func CreateAudioManager(w *ecs.World) ecs.EntityID {
+	audioContext := audio.NewContext(44100)
+	entity := w.CreateEntity()
+	w.SetComponent(entity, components.AudioContext{Context: audioContext})
 	return entity
 }
 

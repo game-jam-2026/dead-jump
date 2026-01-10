@@ -10,6 +10,9 @@ import (
 func LoadLevel1() *ecs.World {
 	w := ecs.NewWorld()
 
+	CreateAudioManager(w)
+
+	CreateWall(w, 50, 100, 24, 24)
 	CreateStartPoint(w, 110, 50)
 	playerID := CreateCharacter(w, 110, 50, 0.5)
 
