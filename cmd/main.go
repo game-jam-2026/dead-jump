@@ -34,6 +34,7 @@ func (g *Game) Update() error {
 	collisions := systems.ApplyVelocityWithCollisions(g.w, cfg)
 	systems.HandleProjectileCollisions(g.w, collisions)
 	systems.ApplySpikes(g.w)
+	systems.ApplyAnimation(g.w)
 	systems.ApplySlopeGravity(g.w, cfg)
 	systems.ApplyFriction(g.w, cfg)
 	systems.ApplyConveyorBelt(g.w)

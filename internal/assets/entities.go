@@ -8,6 +8,7 @@ import (
 	_ "image/png"
 	"math"
 	"reflect"
+	"time"
 
 	"github.com/game-jam-2026/dead-jump/internal/ecs"
 	"github.com/game-jam-2026/dead-jump/internal/ecs/components"
@@ -69,6 +70,10 @@ func CreateCharacter(w *ecs.World, x, y float64, scale float64) ecs.EntityID {
 	})
 	w.SetComponent(entity, components.Sprite{
 		Image: scaledImg,
+	})
+	w.SetComponent(entity, components.Animation{
+		Duration: time.Millisecond * 500,
+		Images:   []*ebiten.Image{HeroImage, DeadHeroImage},
 	})
 	w.SetComponent(entity, components.Collision{
 		Shape: resolv.NewRectangleFromTopLeft(x, y, width, height),
