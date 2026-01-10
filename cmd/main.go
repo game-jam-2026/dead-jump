@@ -2,28 +2,78 @@ package main
 
 import (
 	"log"
+	"os"
 	"reflect"
 
 	"github.com/game-jam-2026/dead-jump/internal/assets"
 	"github.com/game-jam-2026/dead-jump/internal/ecs"
 	"github.com/game-jam-2026/dead-jump/internal/ecs/components"
 	"github.com/game-jam-2026/dead-jump/internal/ecs/systems"
+	"github.com/game-jam-2026/dead-jump/internal/menu"
 	"github.com/game-jam-2026/dead-jump/internal/physics"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 type Game struct {
-	w *ecs.World
+	w    *ecs.World
+	menu *menu.Menu
 }
 
 func NewGame() *Game {
-	return &Game{
-		w: assets.LoadLevel1(),
+	g := &Game{}
+
+	// Initialize audio context and register all sounds
+	assets.InitAudio()
+
+	g.menu = menu.NewMenu()
+	g.menu.OnStartGame = func() {
+		g.w = assets.LoadLevel1()
+		g.menu.SetState(menu.StatePlaying)
 	}
+	g.menu.OnRestart = func() {
+		g.w = assets.LoadLevel1()
+	}
+	g.menu.OnResume = func() {
+		g.menu.SetState(menu.StatePlaying)
+	}
+	g.menu.OnQuit = func() {
+		os.Exit(0)
+	}
+
+	return g
 }
 
 func (g *Game) Update() error {
+	state := g.menu.GetState()
+
+	// Handle ESC key
+	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+		switch state {
+		case menu.StatePlaying:
+			g.menu.SetState(menu.StatePaused)
+			return nil
+		case menu.StatePaused:
+			g.menu.SetState(menu.StatePlaying)
+			return nil
+		}
+	}
+
+	// Update based on state
+	switch state {
+	case menu.StateMenu, menu.StatePaused, menu.StateConfirmRestart, menu.StateSettings, menu.StateLevelComplete, menu.StateGameOver:
+		g.menu.Update()
+	case menu.StatePlaying:
+		if g.w != nil {
+			g.updateGame()
+		}
+	}
+
+	return nil
+}
+
+func (g *Game) updateGame() {
 	systems.MoveCharacter(g.w)
 	systems.UpdateCannons(g.w)
 
@@ -43,8 +93,6 @@ func (g *Game) Update() error {
 	systems.DrawLifeCounter(g.w)
 	g.updateCameraTarget()
 	systems.UpdateCameraSystem(g.w)
-
-	return nil
 }
 
 func (g *Game) updateCameraTarget() {
@@ -63,12 +111,29 @@ func (g *Game) updateCameraTarget() {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	camera, _ := ecs.GetResource[components.Camera](g.w)
-	systems.DrawSpritesWithCamera(g.w, screen, camera)
+	state := g.menu.GetState()
+
+	switch state {
+	case menu.StateMenu:
+		g.menu.Draw(screen)
+	case menu.StatePlaying:
+		if g.w != nil {
+			camera, _ := ecs.GetResource[components.Camera](g.w)
+			systems.DrawSpritesWithCamera(g.w, screen, camera)
+		}
+	case menu.StatePaused, menu.StateConfirmRestart, menu.StateSettings, menu.StateLevelComplete, menu.StateGameOver:
+		// Draw game underneath if exists
+		if g.w != nil {
+			camera, _ := ecs.GetResource[components.Camera](g.w)
+			systems.DrawSpritesWithCamera(g.w, screen, camera)
+		}
+		// Draw menu overlay
+		g.menu.Draw(screen)
+	}
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return 320, 240
+	return menu.ScreenWidth, menu.ScreenHeight
 }
 
 func main() {
