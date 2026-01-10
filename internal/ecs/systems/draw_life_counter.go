@@ -29,7 +29,7 @@ func DrawLifeCounter(world *ecs.World) {
 		Count:     life.Count,
 	})
 	world.SetComponent(entity, components.Sprite{
-		Image: assets.HeartImage,
+		Image: assets.OrangeImage,
 	})
 
 	if life.Count == 0 {

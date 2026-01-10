@@ -27,8 +27,8 @@ var (
 	SpikePNG []byte
 	//go:embed img/ground.png
 	GroundPNG []byte
-	//go:embed img/heart.png
-	HeartPNG []byte
+	//go:embed img/orange.png
+	OrangePNG []byte
 )
 
 var (
@@ -36,7 +36,7 @@ var (
 	DeadHeroImage *ebiten.Image
 	SpikeImage    *ebiten.Image
 	GroundImage   *ebiten.Image
-	HeartImage    *ebiten.Image
+	OrangeImage   *ebiten.Image
 )
 
 func init() {
@@ -52,8 +52,8 @@ func init() {
 	groundImg, _, _ := image.Decode(bytes.NewReader(GroundPNG))
 	GroundImage = ebiten.NewImageFromImage(groundImg)
 
-	lifeHeartImg, _, _ := image.Decode(bytes.NewReader(HeartPNG))
-	HeartImage = ebiten.NewImageFromImage(lifeHeartImg)
+	orangeImg, _, _ := image.Decode(bytes.NewReader(OrangePNG))
+	OrangeImage = ebiten.NewImageFromImage(orangeImg)
 }
 
 func CreateCharacter(w *ecs.World, x, y float64, scale float64) ecs.EntityID {
@@ -102,7 +102,7 @@ func CreateLifeCounter(w *ecs.World, lifeCnt int) ecs.EntityID {
 		Vector: linalg.Vector2{X: 10, Y: 10},
 	})
 	w.SetComponent(entity, components.Sprite{
-		Image: HeartImage,
+		Image: OrangeImage,
 	})
 	w.SetComponent(entity, components.Life{
 		Count: lifeCnt,
@@ -111,7 +111,7 @@ func CreateLifeCounter(w *ecs.World, lifeCnt int) ecs.EntityID {
 		Direction: linalg.Vector2{X: 1},
 		Count:     lifeCnt,
 	})
-	
+
 	return entity
 }
 
