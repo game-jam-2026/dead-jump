@@ -6,6 +6,7 @@ import (
 	"github.com/game-jam-2026/dead-jump/internal/assets"
 	"github.com/game-jam-2026/dead-jump/internal/ecs"
 	"github.com/game-jam-2026/dead-jump/internal/ecs/components"
+	"github.com/game-jam-2026/dead-jump/internal/utils"
 )
 
 func ApplySpikes(world *ecs.World) {
@@ -33,7 +34,7 @@ func ApplySpikes(world *ecs.World) {
 
 			intersection := charCollision.Shape.Intersection(spikeCollision.Shape)
 			if !intersection.IsEmpty() {
-				assets.KillEntity(world, charEntity)
+				utils.KillEntity(world, charEntity, assets.DeadHeroImage, assets.SpikeDeathSounds, assets.CreateCharacter)
 				break
 			}
 		}
