@@ -19,7 +19,7 @@ func DrawSprites(world *ecs.World, screen *ebiten.Image) {
 
 	// чтоб не мигало при пересечении, но вообще – надо бы какой-то порядок отрисовки придумать
 	sort.Slice(entities, func(i, j int) bool {
-		return entities[i] > entities[j]
+		return entities[i] < entities[j]
 	})
 
 	for _, e := range entities {

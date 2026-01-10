@@ -8,7 +8,6 @@ import (
 	"image/color"
 	_ "image/png"
 	"math"
-	"reflect"
 
 	"github.com/game-jam-2026/dead-jump/internal/ecs"
 	"github.com/game-jam-2026/dead-jump/internal/ecs/components"
@@ -28,14 +27,14 @@ var DeadHeroPNG []byte
 //go:embed img/spike.png
 var SpikePNG []byte
 
-//go:embed img/wall.png
-var WallPNG []byte
+//go:embed img/ground.png
+var GroundPNG []byte
 
 var (
 	HeroImage     *ebiten.Image
 	DeadHeroImage *ebiten.Image
 	SpikeImage    *ebiten.Image
-	WallImage     *ebiten.Image
+	GroundImage   *ebiten.Image
 )
 
 func init() {
@@ -48,8 +47,8 @@ func init() {
 	spikeImg, _, _ := image.Decode(bytes.NewReader(SpikePNG))
 	SpikeImage = ebiten.NewImageFromImage(spikeImg)
 
-	wallImg, _, _ := image.Decode(bytes.NewReader(WallPNG))
-	WallImage = ebiten.NewImageFromImage(wallImg)
+	groundImg, _, _ := image.Decode(bytes.NewReader(GroundPNG))
+	GroundImage = ebiten.NewImageFromImage(groundImg)
 }
 
 func CreateCharacter(w *ecs.World, x, y float64, scale float64) ecs.EntityID {
@@ -110,6 +109,7 @@ func CreateSpike(w *ecs.World, x, y float64, repeat components.Repeatable) ecs.E
 	})
 	w.SetComponent(entity, components.Spike{})
 	w.SetComponent(entity, repeat)
+	w.SetComponent(entity, components.StaticBody())
 
 	ApplyRepeatable(w, entity)
 
@@ -127,18 +127,22 @@ func CreateStartPoint(w *ecs.World, x, y float64) ecs.EntityID {
 	return entity
 }
 
-func CreateWall(w *ecs.World, x, y, width, height float64) ecs.EntityID {
+func CreateGround(w *ecs.World, x, y, width, height float64, repeatable components.Repeatable) ecs.EntityID {
 	entity := w.CreateEntity()
 
 	w.SetComponent(entity, components.Position{
 		Vector: linalg.Vector2{X: x, Y: y},
 	})
 	w.SetComponent(entity, components.Sprite{
-		Image: WallImage,
+		Image: GroundImage,
 	})
 	w.SetComponent(entity, components.Collision{
-		Shape: resolv.NewRectangleFromTopLeft(x, y, width, height),
+		Shape: resolv.NewRectangleFromTopLeft(x, y+16, width, height),
 	})
+	w.SetComponent(entity, components.StaticBody())
+	w.SetComponent(entity, repeatable)
+
+	ApplyRepeatable(w, entity)
 
 	return entity
 }
@@ -194,42 +198,6 @@ func ApplyRepeatable(w *ecs.World, entity ecs.EntityID) {
 	w.SetComponent(entity, components.Collision{
 		Shape: resolv.NewRectangleFromTopLeft(pos.Vector.X, pos.Vector.Y, float64(newW), float64(newH)),
 	})
-}
-
-func KillEntity(w *ecs.World, entity ecs.EntityID) {
-	pos, _ := ecs.GetComponent[components.Position](w, entity)
-
-	err := w.RemoveComponent(entity, components.Character{})
-	if err != nil {
-		panic(err)
-	}
-	err = w.RemoveComponent(entity, components.Velocity{})
-	if err != nil {
-		panic(err)
-	}
-
-	w.SetComponent(entity, components.Corpse{
-		Durability: 5,
-	})
-
-	w.SetComponent(entity, components.Sprite{
-		Image: DeadHeroImage,
-	})
-
-	// Оффсет для насаживания на штык
-	newY := pos.Vector.Y + 12
-	w.SetComponent(entity, components.Collision{
-		Shape: resolv.NewRectangleFromTopLeft(pos.Vector.X, newY, 24, 24),
-	})
-	w.SetComponent(entity, components.Position{
-		Vector: linalg.Vector2{X: pos.Vector.X, Y: newY},
-	})
-
-	startPoints := w.GetEntities(reflect.TypeOf((*components.StartPoint)(nil)).Elem())
-	if len(startPoints) > 0 {
-		spPos, _ := ecs.GetComponent[components.Position](w, startPoints[0])
-		CreateCharacter(w, spPos.Vector.X, spPos.Vector.Y, 0.5)
-	}
 }
 
 func CreateCannon(w *ecs.World, x, y float64, direction float64) ecs.EntityID {

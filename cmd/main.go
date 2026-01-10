@@ -19,7 +19,7 @@ type Game struct {
 
 func NewGame() *Game {
 	return &Game{
-		w: assets.LoadCannonLevel(),
+		w: assets.LoadLevel1(),
 	}
 }
 

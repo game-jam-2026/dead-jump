@@ -3,6 +3,7 @@ package utils
 import (
 	"reflect"
 
+	"github.com/game-jam-2026/dead-jump/pkg/linalg"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/solarlune/resolv"
 
@@ -36,6 +37,8 @@ func KillEntity(
 		Durability: 5,
 	})
 
+	w.SetComponent(entity, components.StaticBody())
+
 	bounds := deadImage.Bounds()
 	width := float64(bounds.Dx()) * scale
 	height := float64(bounds.Dy()) * scale
@@ -49,9 +52,16 @@ func KillEntity(
 		Image: scaledImg,
 	})
 
+	newPosY := pos.Vector.Y + 12
+
 	w.SetComponent(entity, components.Collision{
-		Shape: resolv.NewRectangleFromTopLeft(pos.Vector.X, pos.Vector.Y, width, height),
+		Shape: resolv.NewRectangleFromTopLeft(pos.Vector.X, newPosY, width, height),
 	})
+	newVec := linalg.Vector2{
+		X: pos.Vector.X,
+		Y: newPosY,
+	}
+	w.SetComponent(entity, components.Position{Vector: newVec})
 
 	startPoints := w.GetEntities(reflect.TypeOf((*components.StartPoint)(nil)).Elem())
 	if len(startPoints) > 0 {

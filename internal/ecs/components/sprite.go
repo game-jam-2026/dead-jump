@@ -3,5 +3,6 @@ package components
 import "github.com/hajimehoshi/ebiten/v2"
 
 type Sprite struct {
-	Image *ebiten.Image
+	Image  *ebiten.Image
+	ZIndex int
 }
