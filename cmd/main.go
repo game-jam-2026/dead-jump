@@ -40,7 +40,7 @@ func (g *Game) Update() error {
 	systems.ApplyConveyorBelt(g.w)
 	systems.UpdateProjectileLifetime(g.w)
 	systems.CleanupOffscreenProjectiles(g.w, assets.WorldWidth, assets.WorldHeight)
-
+	systems.DrawLifeCounter(g.w)
 	g.updateCameraTarget()
 	systems.UpdateCameraSystem(g.w)
 

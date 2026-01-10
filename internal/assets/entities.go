@@ -18,23 +18,25 @@ import (
 	"github.com/solarlune/resolv"
 )
 
-//go:embed img/hero.png
-var HeroPNG []byte
-
-//go:embed img/dead_hero.png
-var DeadHeroPNG []byte
-
-//go:embed img/spike.png
-var SpikePNG []byte
-
-//go:embed img/ground.png
-var GroundPNG []byte
+var (
+	//go:embed img/hero.png
+	HeroPNG []byte
+	//go:embed img/dead_hero.png
+	DeadHeroPNG []byte
+	//go:embed img/spike.png
+	SpikePNG []byte
+	//go:embed img/ground.png
+	GroundPNG []byte
+	//go:embed img/heart.png
+	HeartPNG []byte
+)
 
 var (
 	HeroImage     *ebiten.Image
 	DeadHeroImage *ebiten.Image
 	SpikeImage    *ebiten.Image
 	GroundImage   *ebiten.Image
+	HeartImage    *ebiten.Image
 )
 
 func init() {
@@ -49,6 +51,9 @@ func init() {
 
 	groundImg, _, _ := image.Decode(bytes.NewReader(GroundPNG))
 	GroundImage = ebiten.NewImageFromImage(groundImg)
+
+	lifeHeartImg, _, _ := image.Decode(bytes.NewReader(HeartPNG))
+	HeartImage = ebiten.NewImageFromImage(lifeHeartImg)
 }
 
 func CreateCharacter(w *ecs.World, x, y float64, scale float64) ecs.EntityID {
@@ -88,6 +93,25 @@ func CreateCharacter(w *ecs.World, x, y float64, scale float64) ecs.EntityID {
 
 	w.SetComponent(entity, components.Character{})
 
+	return entity
+}
+
+func CreateLifeCounter(w *ecs.World, lifeCnt int) ecs.EntityID {
+	entity := w.CreateEntity()
+	w.SetComponent(entity, components.Position{
+		Vector: linalg.Vector2{X: 10, Y: 10},
+	})
+	w.SetComponent(entity, components.Sprite{
+		Image: HeartImage,
+	})
+	w.SetComponent(entity, components.Life{
+		Count: lifeCnt,
+	})
+	w.SetComponent(entity, components.Repeatable{
+		Direction: linalg.Vector2{X: 1},
+		Count:     lifeCnt,
+	})
+	
 	return entity
 }
 

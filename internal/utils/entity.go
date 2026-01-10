@@ -68,4 +68,11 @@ func KillEntity(
 		spPos, _ := ecs.GetComponent[components.Position](w, startPoints[0])
 		createCharacterFunc(w, spPos.Vector.X, spPos.Vector.Y, scale)
 	}
+
+	lifeCounters := w.GetEntities(reflect.TypeOf((*components.Life)(nil)).Elem())
+	if len(lifeCounters) > 0 {
+		life, _ := ecs.GetComponent[components.Life](w, lifeCounters[0])
+		life.Count += -1
+		w.SetComponent(lifeCounters[0], *life)
+	}
 }
