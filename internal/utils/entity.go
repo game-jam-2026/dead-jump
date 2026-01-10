@@ -3,13 +3,13 @@ package utils
 import (
 	"reflect"
 
-	"github.com/game-jam-2026/dead-jump/pkg/linalg"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/solarlune/resolv"
 
-	"github.com/game-jam-2026/dead-jump/internal/assets"
 	"github.com/game-jam-2026/dead-jump/internal/ecs"
 	"github.com/game-jam-2026/dead-jump/internal/ecs/components"
+	"github.com/game-jam-2026/dead-jump/internal/utils/audio"
+	"github.com/game-jam-2026/dead-jump/pkg/linalg"
 )
 
 func KillEntity(
@@ -19,7 +19,7 @@ func KillEntity(
 	scale float64,
 	createCharacterFunc func(w *ecs.World, x, y float64, scale float64) ecs.EntityID,
 ) {
-	assets.PlayRandomDeathSound()
+	audio.Play(audio.SoundDeath)
 
 	pos, _ := ecs.GetComponent[components.Position](w, entity)
 

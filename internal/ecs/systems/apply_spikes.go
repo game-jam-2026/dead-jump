@@ -9,7 +9,7 @@ import (
 	"github.com/game-jam-2026/dead-jump/internal/utils"
 )
 
-func ApplySpikes(world *ecs.World) {
+func ApplySpikes(world *ecs.World) bool {
 	characters := world.GetEntities(
 		reflect.TypeOf((*components.Character)(nil)).Elem(),
 		reflect.TypeOf((*components.Collision)(nil)).Elem(),
@@ -35,8 +35,9 @@ func ApplySpikes(world *ecs.World) {
 			intersection := charCollision.Shape.Intersection(spikeCollision.Shape)
 			if !intersection.IsEmpty() {
 				utils.KillEntity(world, charEntity, assets.DeadHeroImage, 0.5, assets.CreateCharacter)
-				break
+				return true // Death occurred
 			}
 		}
 	}
+	return false
 }

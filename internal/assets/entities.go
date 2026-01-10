@@ -9,13 +9,13 @@ import (
 	_ "image/png"
 	"math"
 
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/solarlune/resolv"
+
 	"github.com/game-jam-2026/dead-jump/internal/ecs"
 	"github.com/game-jam-2026/dead-jump/internal/ecs/components"
+	"github.com/game-jam-2026/dead-jump/internal/utils/audio"
 	"github.com/game-jam-2026/dead-jump/pkg/linalg"
-
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/audio"
-	"github.com/solarlune/resolv"
 )
 
 var (
@@ -111,7 +111,7 @@ func CreateLifeCounter(w *ecs.World, lifeCnt int) ecs.EntityID {
 		Direction: linalg.Vector2{X: 1},
 		Count:     lifeCnt,
 	})
-	
+
 	return entity
 }
 
@@ -172,10 +172,11 @@ func CreateGround(w *ecs.World, x, y, width, height float64, repeatable componen
 }
 
 func CreateAudioManager(w *ecs.World) ecs.EntityID {
-	audioContext := audio.NewContext(44100)
-	InitAudio(audioContext)
 	entity := w.CreateEntity()
-	w.SetComponent(entity, components.AudioContext{Context: audioContext})
+
+	audio.Init()
+
+	w.SetComponent(entity, components.AudioContext{Context: audio.GetContext()})
 	return entity
 }
 

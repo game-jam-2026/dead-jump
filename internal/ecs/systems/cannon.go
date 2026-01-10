@@ -5,13 +5,13 @@ import (
 	"math"
 	"reflect"
 
-	"github.com/game-jam-2026/dead-jump/internal/assets"
-	"github.com/game-jam-2026/dead-jump/internal/ecs"
-	"github.com/game-jam-2026/dead-jump/internal/ecs/components"
-	"github.com/game-jam-2026/dead-jump/pkg/linalg"
-
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/solarlune/resolv"
+
+	"github.com/game-jam-2026/dead-jump/internal/ecs"
+	"github.com/game-jam-2026/dead-jump/internal/ecs/components"
+	"github.com/game-jam-2026/dead-jump/internal/utils/audio"
+	"github.com/game-jam-2026/dead-jump/pkg/linalg"
 )
 
 func UpdateCannons(world *ecs.World) {
@@ -49,7 +49,7 @@ func UpdateCannons(world *ecs.World) {
 			}
 
 			spawnProjectile(world, spawnX, spawnY, velocity, cannon.ProjectileMass)
-			assets.PlayCannonShot()
+			audio.Play(audio.SoundCannonShot)
 		}
 
 		world.SetComponent(e, *cannon)
@@ -129,7 +129,7 @@ func HandleProjectileCollisions(world *ecs.World, collisions []CollisionResult) 
 
 		_, isCharacter := ecs.GetComponent[components.Character](world, targetID)
 		if isCharacter == nil {
-			assets.PlayTsch()
+			audio.Play(audio.SoundProjectileHit)
 			projVel, err := ecs.GetComponent[components.Velocity](world, projectileID)
 			if err == nil && projVel.Vector.Length() >= proj.MinSpeedForImpulse {
 				ApplyProjectileImpulse(world, projectileID, targetID, proj.ImpulseMagnitude)
