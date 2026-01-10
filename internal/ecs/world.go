@@ -6,14 +6,16 @@ import (
 )
 
 type World struct {
-	Entities map[reflect.Type]map[EntityID]interface{}
-	LastID   EntityID
+	Entities  map[reflect.Type]map[EntityID]interface{}
+	Resources map[reflect.Type]interface{}
+	LastID    EntityID
 }
 
 func NewWorld() *World {
 	return &World{
-		Entities: make(map[reflect.Type]map[EntityID]interface{}),
-		LastID:   0,
+		Entities:  make(map[reflect.Type]map[EntityID]interface{}),
+		Resources: make(map[reflect.Type]interface{}),
+		LastID:    0,
 	}
 }
 
@@ -72,6 +74,11 @@ func (w *World) DestroyEntity(entity EntityID) {
 	}
 }
 
+func (w *World) SetResource(resource interface{}) {
+	t := reflect.TypeOf(resource)
+	w.Resources[t] = resource
+}
+
 func GetComponent[C any](w *World, entity EntityID) (*C, error) {
 	t := reflect.TypeOf((*C)(nil)).Elem()
 	if w.Entities[t] == nil || w.Entities[t][entity] == nil {
@@ -83,4 +90,17 @@ func GetComponent[C any](w *World, entity EntityID) (*C, error) {
 	}
 
 	return &component, nil
+}
+
+func GetResource[R any](w *World) (*R, error) {
+	t := reflect.TypeOf((*R)(nil)).Elem()
+	if w.Resources[t] == nil {
+		return nil, fmt.Errorf("resource %v not found", t)
+	}
+	resource, ok := w.Resources[t].(R)
+	if !ok {
+		return nil, fmt.Errorf("resource has the wrong type")
+	}
+
+	return &resource, nil
 }

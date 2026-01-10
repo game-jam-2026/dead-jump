@@ -50,21 +50,41 @@ func init() {
 	WallImage = ebiten.NewImageFromImage(wallImg)
 }
 
-func CreateCharacter(w *ecs.World, x, y float64) ecs.EntityID {
+func CreateCharacter(w *ecs.World, x, y float64, scale float64) ecs.EntityID {
 	entity := w.CreateEntity()
+
+	bounds := HeroImage.Bounds()
+	origW := float64(bounds.Dx())
+	origH := float64(bounds.Dy())
+	width := origW * scale
+	height := origH * scale
+
+	scaledImg := ebiten.NewImage(int(width), int(height))
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Scale(scale, scale)
+	scaledImg.DrawImage(HeroImage, op)
 
 	w.SetComponent(entity, components.Position{
 		Vector: linalg.Vector2{X: x, Y: y},
 	})
 	w.SetComponent(entity, components.Sprite{
-		Image: HeroImage,
+		Image: scaledImg,
 	})
 	w.SetComponent(entity, components.Collision{
-		Shape: resolv.NewRectangleFromTopLeft(x, y, 24, 32),
+		Shape: resolv.NewRectangleFromTopLeft(x, y, width, height),
 	})
 	w.SetComponent(entity, components.Velocity{
-		Vector: linalg.Vector2{X: 0, Y: 0.5},
+		Vector: linalg.Zero(),
 	})
+
+	body := components.DefaultPhysicsBody()
+	body.Mass = 1.0
+	body.Friction = 0.3
+	body.AirDrag = 0.15
+	body.GravityScale = 1.0
+	body.MaxSpeed = 8.0
+	w.SetComponent(entity, body)
+
 	w.SetComponent(entity, components.Character{})
 
 	return entity
@@ -198,6 +218,6 @@ func KillEntity(w *ecs.World, entity ecs.EntityID) {
 	startPoints := w.GetEntities(reflect.TypeOf((*components.StartPoint)(nil)).Elem())
 	if len(startPoints) > 0 {
 		spPos, _ := ecs.GetComponent[components.Position](w, startPoints[0])
-		CreateCharacter(w, spPos.Vector.X, spPos.Vector.Y)
+		CreateCharacter(w, spPos.Vector.X, spPos.Vector.Y, 0.5)
 	}
 }
