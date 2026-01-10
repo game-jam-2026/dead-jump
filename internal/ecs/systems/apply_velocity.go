@@ -10,7 +10,7 @@ import (
 func ApplyVelocity(world *ecs.World) {
 	entities := world.GetEntities(
 		reflect.TypeOf((*components.Position)(nil)).Elem(),
-		//reflect.TypeOf((*components.Velocity)(nil)).Elem(),
+		reflect.TypeOf((*components.Velocity)(nil)).Elem(),
 	)
 
 	for _, e := range entities {
