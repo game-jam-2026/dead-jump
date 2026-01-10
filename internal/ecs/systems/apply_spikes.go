@@ -8,7 +8,7 @@ import (
 	"github.com/game-jam-2026/dead-jump/internal/ecs/components"
 )
 
-func KillCharacter(world *ecs.World) {
+func ApplySpikes(world *ecs.World) {
 	characters := world.GetEntities(
 		reflect.TypeOf((*components.Character)(nil)).Elem(),
 		reflect.TypeOf((*components.Collision)(nil)).Elem(),

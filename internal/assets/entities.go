@@ -3,10 +3,10 @@ package assets
 import (
 	"bytes"
 	_ "embed"
+	"fmt"
 	"image"
-	"image/color"
 	_ "image/png"
-	"math/rand"
+	"math"
 	"reflect"
 
 	"github.com/game-jam-2026/dead-jump/internal/ecs"
@@ -26,29 +26,15 @@ var DeadHeroPNG []byte
 //go:embed static/spike.png
 var SpikePNG []byte
 
+//go:embed static/wall.png
+var WallPNG []byte
+
 var (
 	HeroImage     *ebiten.Image
 	DeadHeroImage *ebiten.Image
 	SpikeImage    *ebiten.Image
+	WallImage     *ebiten.Image
 )
-
-func GenerateRandomImage(width, height int) *ebiten.Image {
-	img := image.NewRGBA(image.Rect(0, 0, width, height))
-
-	for y := 0; y < height; y++ {
-		for x := 0; x < width; x++ {
-			c := color.RGBA{
-				R: uint8(rand.Intn(256)),
-				G: uint8(rand.Intn(256)),
-				B: uint8(rand.Intn(256)),
-				A: 255,
-			}
-			img.Set(x, y, c)
-		}
-	}
-
-	return ebiten.NewImageFromImage(img)
-}
 
 func init() {
 	heroImg, _, _ := image.Decode(bytes.NewReader(HeroPNG))
@@ -59,6 +45,9 @@ func init() {
 
 	spikeImg, _, _ := image.Decode(bytes.NewReader(SpikePNG))
 	SpikeImage = ebiten.NewImageFromImage(spikeImg)
+
+	wallImg, _, _ := image.Decode(bytes.NewReader(WallPNG))
+	WallImage = ebiten.NewImageFromImage(wallImg)
 }
 
 func CreateCharacter(w *ecs.World, x, y float64) ecs.EntityID {
@@ -81,7 +70,7 @@ func CreateCharacter(w *ecs.World, x, y float64) ecs.EntityID {
 	return entity
 }
 
-func CreateSpike(w *ecs.World, x, y float64) ecs.EntityID {
+func CreateSpike(w *ecs.World, x, y float64, repeat components.Repeatable) ecs.EntityID {
 	entity := w.CreateEntity()
 
 	bounds := SpikeImage.Bounds()
@@ -98,6 +87,9 @@ func CreateSpike(w *ecs.World, x, y float64) ecs.EntityID {
 		Shape: resolv.NewRectangleFromTopLeft(x, y, width, height),
 	})
 	w.SetComponent(entity, components.Spike{})
+	w.SetComponent(entity, repeat)
+
+	ApplyRepeatable(w, entity)
 
 	return entity
 }
@@ -120,13 +112,58 @@ func CreateWall(w *ecs.World, x, y, width, height float64) ecs.EntityID {
 		Vector: linalg.Vector2{X: x, Y: y},
 	})
 	w.SetComponent(entity, components.Sprite{
-		Image: GenerateRandomImage(int(width), int(height)),
+		Image: WallImage,
 	})
 	w.SetComponent(entity, components.Collision{
 		Shape: resolv.NewRectangleFromTopLeft(x, y, width, height),
 	})
 
 	return entity
+}
+
+func ApplyRepeatable(w *ecs.World, entity ecs.EntityID) {
+	rep, err := ecs.GetComponent[components.Repeatable](w, entity)
+	if err != nil {
+		return
+	}
+
+	sprite, err := ecs.GetComponent[components.Sprite](w, entity)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	pos, err := ecs.GetComponent[components.Position](w, entity)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	origBounds := sprite.Image.Bounds()
+	origW, origH := origBounds.Dx(), origBounds.Dy()
+
+	newW := origW
+	newH := origH
+	if rep.Direction.X > 0 {
+		newW = origW * rep.Count
+	}
+	if rep.Direction.Y > 0 {
+		newH = origH * rep.Count
+	}
+
+	newImg := ebiten.NewImage(newW, newH)
+	for i := 0; i < rep.Count; i++ {
+		op := &ebiten.DrawImageOptions{}
+		offsetX := float64(i*origW) * math.Abs(rep.Direction.X)
+		offsetY := float64(i*origH) * math.Abs(rep.Direction.Y)
+
+		op.GeoM.Translate(offsetX, offsetY)
+		newImg.DrawImage(sprite.Image, op)
+	}
+
+	w.SetComponent(entity, components.Sprite{Image: newImg})
+	w.SetComponent(entity, components.Collision{
+		Shape: resolv.NewRectangleFromTopLeft(pos.Vector.X, pos.Vector.Y, float64(newW), float64(newH)),
+	})
 }
 
 func KillEntity(w *ecs.World, entity ecs.EntityID) {

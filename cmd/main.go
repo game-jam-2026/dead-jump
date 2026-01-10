@@ -17,7 +17,7 @@ type Game struct {
 func (g *Game) Update() error {
 	systems.ApplyVelocity(g.w)
 	systems.PushColliders(g.w)
-	systems.KillCharacter(g.w)
+	systems.ApplySpikes(g.w)
 
 	return nil
 }
