@@ -5,6 +5,7 @@ import (
 	"math"
 	"reflect"
 
+	"github.com/game-jam-2026/dead-jump/internal/assets"
 	"github.com/game-jam-2026/dead-jump/internal/ecs"
 	"github.com/game-jam-2026/dead-jump/internal/ecs/components"
 	"github.com/game-jam-2026/dead-jump/pkg/linalg"
@@ -48,6 +49,7 @@ func UpdateCannons(world *ecs.World) {
 			}
 
 			spawnProjectile(world, spawnX, spawnY, velocity, cannon.ProjectileMass)
+			assets.PlayCannonShot()
 		}
 
 		world.SetComponent(e, *cannon)
@@ -119,8 +121,15 @@ func HandleProjectileCollisions(world *ecs.World, collisions []CollisionResult) 
 			continue
 		}
 
+		body, err := ecs.GetComponent[components.PhysicsBody](world, targetID)
+		if err == nil && body.IsStatic() {
+			world.DestroyEntity(projectileID)
+			continue
+		}
+
 		_, isCharacter := ecs.GetComponent[components.Character](world, targetID)
 		if isCharacter == nil {
+			assets.PlayTsch()
 			projVel, err := ecs.GetComponent[components.Velocity](world, projectileID)
 			if err == nil && projVel.Vector.Length() >= proj.MinSpeedForImpulse {
 				ApplyProjectileImpulse(world, projectileID, targetID, proj.ImpulseMagnitude)

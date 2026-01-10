@@ -19,7 +19,7 @@ type Game struct {
 
 func NewGame() *Game {
 	return &Game{
-		w: assets.LoadPhysicsTestLevel(),
+		w: assets.LoadCannonLevel(),
 	}
 }
 
@@ -65,7 +65,6 @@ func (g *Game) updateCameraTarget() {
 func (g *Game) Draw(screen *ebiten.Image) {
 	camera, _ := ecs.GetResource[components.Camera](g.w)
 	systems.DrawSpritesWithCamera(g.w, screen, camera)
-	systems.DrawCollisions(g.w, screen)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {

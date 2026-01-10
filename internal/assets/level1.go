@@ -9,7 +9,6 @@ import (
 
 func LoadLevel1() *ecs.World {
 	w := ecs.NewWorld()
-
 	CreateAudioManager(w)
 
 	CreateWall(w, 50, 100, 24, 24)

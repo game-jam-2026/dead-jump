@@ -5,10 +5,10 @@ import (
 	_ "embed"
 	"fmt"
 	"image"
+	"image/color"
 	_ "image/png"
 	"math"
 	"reflect"
-	"time"
 
 	"github.com/game-jam-2026/dead-jump/internal/ecs"
 	"github.com/game-jam-2026/dead-jump/internal/ecs/components"
@@ -30,14 +30,6 @@ var SpikePNG []byte
 
 //go:embed img/wall.png
 var WallPNG []byte
-
-//go:embed sfx/spikeDeath1.mp3
-var SpikeDeath1MP3 []byte
-
-//go:embed sfx/spikeDeath2.mp3
-var SpikeDeath2MP3 []byte
-
-var SpikeDeathSounds = [][]byte{SpikeDeath1MP3, SpikeDeath2MP3}
 
 var (
 	HeroImage     *ebiten.Image
@@ -80,10 +72,6 @@ func CreateCharacter(w *ecs.World, x, y float64, scale float64) ecs.EntityID {
 	w.SetComponent(entity, components.Sprite{
 		Image: scaledImg,
 	})
-	w.SetComponent(entity, components.Animation{
-		Duration: time.Millisecond * 500,
-		Images:   []*ebiten.Image{HeroImage, DeadHeroImage},
-	})
 	w.SetComponent(entity, components.Collision{
 		Shape: resolv.NewRectangleFromTopLeft(x, y, width, height),
 	})
@@ -96,7 +84,7 @@ func CreateCharacter(w *ecs.World, x, y float64, scale float64) ecs.EntityID {
 	body.Friction = 0.3
 	body.AirDrag = 0.15
 	body.GravityScale = 1.0
-	body.MaxSpeed = 8.0
+	body.MaxSpeed = 20.0
 	w.SetComponent(entity, body)
 
 	w.SetComponent(entity, components.Character{})
@@ -157,6 +145,7 @@ func CreateWall(w *ecs.World, x, y, width, height float64) ecs.EntityID {
 
 func CreateAudioManager(w *ecs.World) ecs.EntityID {
 	audioContext := audio.NewContext(44100)
+	InitAudio(audioContext)
 	entity := w.CreateEntity()
 	w.SetComponent(entity, components.AudioContext{Context: audioContext})
 	return entity
@@ -241,4 +230,28 @@ func KillEntity(w *ecs.World, entity ecs.EntityID) {
 		spPos, _ := ecs.GetComponent[components.Position](w, startPoints[0])
 		CreateCharacter(w, spPos.Vector.X, spPos.Vector.Y, 0.5)
 	}
+}
+
+func CreateCannon(w *ecs.World, x, y float64, direction float64) ecs.EntityID {
+	entity := w.CreateEntity()
+
+	w.SetComponent(entity, components.Position{
+		Vector: linalg.Vector2{X: x, Y: y},
+	})
+
+	size := 16
+	img := ebiten.NewImage(size, size)
+	img.Fill(color.RGBA{40, 40, 40, 255})
+	w.SetComponent(entity, components.Sprite{
+		Image: img,
+	})
+
+	cannon := components.DefaultCannon()
+	cannon.Direction = direction
+	cannon.FireRate = 120
+	cannon.ProjectileSpeed = 15.0
+	cannon.ProjectileMass = 15.0
+	w.SetComponent(entity, cannon)
+
+	return entity
 }
