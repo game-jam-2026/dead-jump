@@ -44,7 +44,7 @@ func LoadLevel1() *ecs.World {
 
 	characterEntity1 := w.CreateEntity()
 	w.SetComponent(characterEntity1, components.Position{
-		P: linalg.Vector2{X: 100, Y: 100},
+		Vector: linalg.Vector2{X: 100, Y: 100},
 	})
 	w.SetComponent(characterEntity1, components.Sprite{
 		Image: GenerateRandomImage(24, 24),
@@ -55,7 +55,7 @@ func LoadLevel1() *ecs.World {
 
 	characterEntity2 := w.CreateEntity()
 	w.SetComponent(characterEntity2, components.Position{
-		P: linalg.Vector2{X: 110, Y: 50},
+		Vector: linalg.Vector2{X: 110, Y: 50},
 	})
 	w.SetComponent(characterEntity2, components.Sprite{
 		Image: ebiten.NewImageFromImage(heroImg),
@@ -64,7 +64,7 @@ func LoadLevel1() *ecs.World {
 		Shape: resolv.NewRectangleFromTopLeft(110, 50, 24, 32),
 	})
 	w.SetComponent(characterEntity2, components.Velocity{
-		V: linalg.Vector2{X: 0, Y: 0.2},
+		Vector: linalg.Vector2{X: 0, Y: 0.2},
 	})
 
 	return w

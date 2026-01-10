@@ -29,7 +29,7 @@ func DrawSprites(world *ecs.World, screen *ebiten.Image) {
 		}
 
 		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Translate(pos.P.X, pos.P.Y)
+		op.GeoM.Translate(pos.Vector.X, pos.Vector.Y)
 		screen.DrawImage(sprite.Image, op)
 	}
 }

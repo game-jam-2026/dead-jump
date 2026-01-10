@@ -5,5 +5,5 @@ import (
 )
 
 type Velocity struct {
-	V linalg.Vector2
+	Vector linalg.Vector2
 }

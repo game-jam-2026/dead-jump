@@ -30,7 +30,7 @@ func PushColliders(world *ecs.World) {
 		}
 
 		bounds := c.Shape.Bounds()
-		c.Shape.SetPosition(pos.P.X+bounds.Width()/2, pos.P.Y+bounds.Height()/2)
+		c.Shape.SetPosition(pos.Vector.X+bounds.Width()/2, pos.Vector.Y+bounds.Height()/2)
 
 		for _, otherE := range entities[i+1:] {
 			otherC, err := ecs.GetComponent[components.Collision](world, otherE)
@@ -43,17 +43,17 @@ func PushColliders(world *ecs.World) {
 				continue
 			}
 
-			pos.P.X += intersection.MTV.X
-			pos.P.Y += intersection.MTV.Y
+			pos.Vector.X += intersection.MTV.X
+			pos.Vector.Y += intersection.MTV.Y
 
 			if intersection.MTV.X != 0 {
-				vel.V.X = 0
+				vel.Vector.X = 0
 			}
 			if intersection.MTV.Y != 0 {
-				vel.V.Y = 0
+				vel.Vector.Y = 0
 			}
 
-			c.Shape.SetPosition(pos.P.X+bounds.Width()/2, pos.P.Y+bounds.Height()/2)
+			c.Shape.SetPosition(pos.Vector.X+bounds.Width()/2, pos.Vector.Y+bounds.Height()/2)
 			world.SetComponent(e, *pos)
 			world.SetComponent(e, *c)
 			world.SetComponent(e, *vel)
