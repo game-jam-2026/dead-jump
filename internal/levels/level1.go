@@ -39,33 +39,40 @@ func GenerateRandomImage(width, height int) *ebiten.Image {
 
 func LoadLevel1() *ecs.World {
 	w := ecs.NewWorld()
-
-	heroImg, _, _ := image.Decode(bytes.NewReader(heroPNG))
-
-	characterEntity1 := w.CreateEntity()
-	w.SetComponent(characterEntity1, components.Position{
-		Vector: linalg.Vector2{X: 100, Y: 100},
-	})
-	w.SetComponent(characterEntity1, components.Sprite{
-		Image: GenerateRandomImage(24, 24),
-	})
-	w.SetComponent(characterEntity1, components.Collision{
-		Shape: resolv.NewRectangleFromTopLeft(100, 100, 24, 24),
-	})
-
-	characterEntity2 := w.CreateEntity()
-	w.SetComponent(characterEntity2, components.Position{
-		Vector: linalg.Vector2{X: 110, Y: 50},
-	})
-	w.SetComponent(characterEntity2, components.Sprite{
-		Image: ebiten.NewImageFromImage(heroImg),
-	})
-	w.SetComponent(characterEntity2, components.Collision{
-		Shape: resolv.NewRectangleFromTopLeft(110, 50, 24, 32),
-	})
-	w.SetComponent(characterEntity2, components.Velocity{
-		Vector: linalg.Vector2{X: 0, Y: 0.2},
-	})
+	makeFloor(w)
+	makeCharacter(w)
 
 	return w
+}
+
+func makeFloor(w *ecs.World) {
+	floor := w.CreateEntity()
+	w.SetComponent(floor, components.Position{
+		Vector: linalg.Vector2{X: 0, Y: 200},
+	})
+	w.SetComponent(floor, components.Sprite{
+		Image: GenerateRandomImage(320, 40),
+	})
+	w.SetComponent(floor, components.Collision{
+		Shape: resolv.NewRectangleFromTopLeft(0, 200, 320, 40),
+	})
+}
+
+func makeCharacter(w *ecs.World) {
+	img, _, _ := image.Decode(bytes.NewReader(heroPNG))
+	character := w.CreateEntity()
+
+	w.SetComponent(character, components.Position{
+		Vector: linalg.Vector2{X: 110, Y: 10},
+	})
+	w.SetComponent(character, components.Sprite{
+		Image: ebiten.NewImageFromImage(img),
+	})
+	w.SetComponent(character, components.Collision{
+		Shape: resolv.NewRectangleFromTopLeft(110, 10, 24, 32),
+	})
+	w.SetComponent(character, components.Velocity{
+		Vector: linalg.Vector2{X: 0, Y: 1},
+	})
+	w.SetComponent(character, components.Character{})
 }
