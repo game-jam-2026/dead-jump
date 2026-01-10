@@ -3,6 +3,7 @@ package systems
 import (
 	"math"
 	"reflect"
+	"sort"
 
 	"github.com/game-jam-2026/dead-jump/internal/ecs"
 	"github.com/game-jam-2026/dead-jump/internal/ecs/components"
@@ -70,6 +71,24 @@ func DrawSpritesWithCamera(world *ecs.World, screen *ebiten.Image, camera *compo
 		reflect.TypeOf((*components.Position)(nil)).Elem(),
 		reflect.TypeOf((*components.Sprite)(nil)).Elem(),
 	)
+
+	sort.Slice(entities, func(i, j int) bool {
+		spriteI, _ := ecs.GetComponent[components.Sprite](world, entities[i])
+		spriteJ, _ := ecs.GetComponent[components.Sprite](world, entities[j])
+
+		if spriteI.ZIndex != spriteJ.ZIndex {
+			return spriteI.ZIndex < spriteJ.ZIndex
+		}
+
+		posI, _ := ecs.GetComponent[components.Position](world, entities[i])
+		posJ, _ := ecs.GetComponent[components.Position](world, entities[j])
+
+		if posI.Vector.Y != posJ.Vector.Y {
+			return posI.Vector.Y < posJ.Vector.Y
+		}
+
+		return entities[i] < entities[j]
+	})
 
 	for _, e := range entities {
 		pos, err := ecs.GetComponent[components.Position](world, e)
