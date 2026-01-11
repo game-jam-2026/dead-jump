@@ -94,6 +94,23 @@ func RegisterMusicWAV(id SoundID, data []byte) error {
 	return nil
 }
 
+func RegisterMusicMP3(id SoundID, data []byte) error {
+	if defaultManager == nil {
+		Init()
+	}
+	stream, err := mp3.DecodeWithoutResampling(bytes.NewReader(data))
+	if err != nil {
+		return err
+	}
+	loop := audio.NewInfiniteLoop(stream, stream.Length())
+	player, err := defaultManager.context.NewPlayer(loop)
+	if err != nil {
+		return err
+	}
+	defaultManager.musicPlayers[id] = player
+	return nil
+}
+
 func Play(id SoundID) {
 	if defaultManager == nil || defaultManager.muted {
 		return

@@ -11,4 +11,7 @@ const (
 	SoundProjectileHit
 	SoundDeath
 	SoundGameOver
+
+	SoundLevelMusic
+	SoundStep
 )
