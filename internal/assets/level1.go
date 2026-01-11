@@ -10,7 +10,7 @@ import (
 func LoadLevel1() *ecs.World {
 	w := ecs.NewWorld()
 	CreateAudioManager(w)
-	CreateLifeCounter(w, 3)
+	CreateLifeCounter(w, 5)
 	CreateStartPoint(w, 20, 50)
 
 	playerID := CreateCharacter(w, 20, 50, 1)
@@ -29,6 +29,8 @@ func LoadLevel1() *ecs.World {
 		Direction: linalg.Vector2{X: 1},
 		Count:     5,
 	})
+
+	CreateLevelFinish(w, 290, 194)
 
 	camera := components.NewCamera(320, 240)
 	camera.Target = int64(playerID)

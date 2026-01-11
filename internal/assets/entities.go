@@ -31,15 +31,24 @@ var (
 	GroundPNG []byte
 	//go:embed img/orange.png
 	OrangePNG []byte
+	//go:embed img/tombstone1.png
+	Tombstone1PNG []byte
+	//go:embed img/tombstone2.png
+	Tombstone2PNG []byte
+	//go:embed img/tombstone3.png
+	Tombstone3PNG []byte
 )
 
 var (
-	HeroImage     *ebiten.Image
+	HeroImage       *ebiten.Image
 	HeroJumpImage *ebiten.Image
-	DeadHeroImage *ebiten.Image
-	SpikeImage    *ebiten.Image
-	GroundImage   *ebiten.Image
-	OrangeImage   *ebiten.Image
+	DeadHeroImage   *ebiten.Image
+	SpikeImage      *ebiten.Image
+	GroundImage     *ebiten.Image
+	OrangeImage     *ebiten.Image
+	Tombstone1Image *ebiten.Image
+	Tombstone2Image *ebiten.Image
+	Tombstone3Image *ebiten.Image
 )
 
 func init() {
@@ -60,6 +69,15 @@ func init() {
 
 	orangeImg, _, _ := image.Decode(bytes.NewReader(OrangePNG))
 	OrangeImage = ebiten.NewImageFromImage(orangeImg)
+
+	tombstone1Img, _, _ := image.Decode(bytes.NewReader(Tombstone1PNG))
+	Tombstone1Image = ebiten.NewImageFromImage(tombstone1Img)
+
+	tombstone2Img, _, _ := image.Decode(bytes.NewReader(Tombstone2PNG))
+	Tombstone2Image = ebiten.NewImageFromImage(tombstone2Img)
+
+	tombstone3Img, _, _ := image.Decode(bytes.NewReader(Tombstone3PNG))
+	Tombstone3Image = ebiten.NewImageFromImage(tombstone3Img)
 }
 
 func CreateCharacter(w *ecs.World, x, y float64, scale float64) ecs.EntityID {
@@ -132,6 +150,7 @@ func CreateLifeCounter(w *ecs.World, lifeCnt int) ecs.EntityID {
 		Direction: linalg.Vector2{X: 1},
 		Count:     lifeCnt,
 	})
+	w.SetComponent(entity, components.ScreenSpace{})
 
 	return entity
 }
@@ -189,6 +208,65 @@ func CreateGround(w *ecs.World, x, y, width, height float64, repeatable componen
 
 	ApplyRepeatable(w, entity)
 
+	return entity
+}
+
+func CreatePlatform(w *ecs.World, x, y, width, height float64, repeatable components.Repeatable) ecs.EntityID {
+	entity := w.CreateEntity()
+
+	bounds := GroundImage.Bounds()
+	halfHeight := bounds.Dy() / 2
+	halfSprite := ebiten.NewImage(bounds.Dx(), halfHeight)
+	op := &ebiten.DrawImageOptions{}
+	halfSprite.DrawImage(GroundImage.SubImage(image.Rect(0, 0, bounds.Dx(), halfHeight)).(*ebiten.Image), op)
+
+	w.SetComponent(entity, components.Position{
+		Vector: linalg.Vector2{X: x, Y: y},
+	})
+	w.SetComponent(entity, components.Sprite{
+		Image: halfSprite,
+	})
+	w.SetComponent(entity, components.Collision{
+		Shape: resolv.NewRectangleFromTopLeft(x, y+8, width, height/2),
+	})
+	w.SetComponent(entity, components.StaticBody())
+	w.SetComponent(entity, repeatable)
+
+	ApplyRepeatable(w, entity)
+
+	return entity
+}
+
+func CreateTombstone1(w *ecs.World, x, y float64) ecs.EntityID {
+	entity := w.CreateEntity()
+	w.SetComponent(entity, components.Position{
+		Vector: linalg.Vector2{X: x, Y: y},
+	})
+	w.SetComponent(entity, components.Sprite{
+		Image: Tombstone1Image,
+	})
+	return entity
+}
+
+func CreateTombstone2(w *ecs.World, x, y float64) ecs.EntityID {
+	entity := w.CreateEntity()
+	w.SetComponent(entity, components.Position{
+		Vector: linalg.Vector2{X: x, Y: y},
+	})
+	w.SetComponent(entity, components.Sprite{
+		Image: Tombstone2Image,
+	})
+	return entity
+}
+
+func CreateTombstone3(w *ecs.World, x, y float64) ecs.EntityID {
+	entity := w.CreateEntity()
+	w.SetComponent(entity, components.Position{
+		Vector: linalg.Vector2{X: x, Y: y},
+	})
+	w.SetComponent(entity, components.Sprite{
+		Image: Tombstone3Image,
+	})
 	return entity
 }
 

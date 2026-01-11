@@ -27,3 +27,5 @@ func DefaultCannon() Cannon {
 		Active:              true,
 	}
 }
+
+type ScreenSpace struct{}
