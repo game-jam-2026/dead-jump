@@ -13,6 +13,10 @@ import (
 //go:embed assets/fonts/PressStart2P-Regular.ttf
 var fontData []byte
 
+func FontData() []byte {
+	return fontData
+}
+
 //go:embed assets/img/skull.png
 var skullPNG []byte
 

@@ -248,3 +248,30 @@ func CreateCannon(w *ecs.World, x, y float64, direction float64) ecs.EntityID {
 
 	return entity
 }
+
+func CreateLevelFinish(w *ecs.World, x, y float64) ecs.EntityID {
+	entity := w.CreateEntity()
+
+	bounds := OrangeImage.Bounds()
+	width := float64(bounds.Dx())
+	height := float64(bounds.Dy())
+
+	tintedImg := ebiten.NewImage(int(width), int(height))
+	op := &ebiten.DrawImageOptions{}
+	op.ColorScale.Scale(0.3, 0.5, 1.5, 1.0)
+	tintedImg.DrawImage(OrangeImage, op)
+
+	w.SetComponent(entity, components.Position{
+		Vector: linalg.Vector2{X: x, Y: y},
+	})
+	w.SetComponent(entity, components.Sprite{
+		Image:  tintedImg,
+		ZIndex: 5,
+	})
+	w.SetComponent(entity, components.Collision{
+		Shape: resolv.NewRectangleFromTopLeft(x, y, width, height),
+	})
+	w.SetComponent(entity, components.LevelFinish{})
+
+	return entity
+}
