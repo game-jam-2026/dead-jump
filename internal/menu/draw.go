@@ -12,6 +12,11 @@ import (
 func (m *Menu) Draw(screen *ebiten.Image) {
 	shakeX, shakeY := m.getScreenShake()
 
+	if m.state == StateEpilogueEnding {
+		m.drawEpilogueEndingScreen(screen, shakeX, shakeY)
+		return
+	}
+
 	isInGameOverlay := m.state == StateLevelComplete || m.state == StateGameOver ||
 		m.state == StatePaused || m.state == StateConfirmRestart ||
 		(m.state == StateSettings && m.previousState == StatePaused)
@@ -376,6 +381,20 @@ func (m *Menu) drawGameOverScreen(screen *ebiten.Image, shakeX, shakeY float64) 
 	m.drawText(screen, "GAME OVER", centerX+shakeX, 70+shakeY, m.fontMedium, colorDeathRed, true)
 	m.drawText(screen, "YOU DIED", centerX+shakeX, 90+shakeY, m.fontSmall, colorDimGray, true)
 	m.drawMenuItems(screen, m.gameOverItems, 120, shakeX, shakeY)
+}
+
+func (m *Menu) drawEpilogueEndingScreen(screen *ebiten.Image, shakeX, shakeY float64) {
+	screen.Fill(color.RGBA{0, 0, 0, 255})
+
+	centerX := float64(ScreenWidth) / 2
+	centerY := float64(ScreenHeight) / 2
+
+	m.drawText(screen, "This should be stopped.", centerX+shakeX, centerY-20+shakeY, m.fontMedium, colorGhostWhite, true)
+	m.drawText(screen, "...but the cycle continues.", centerX+shakeX, centerY+10+shakeY, m.fontSmall, colorDimGray, true)
+
+	if m.epilogueTimer > 60 {
+		m.drawText(screen, "Press ENTER to continue", centerX+shakeX, centerY+60+shakeY, m.fontSmall, colorDeadPurple, true)
+	}
 }
 
 func (m *Menu) pulseColor(base color.RGBA) color.RGBA {
