@@ -31,6 +31,16 @@ var (
 	GroundPNG []byte
 	//go:embed img/orange.png
 	OrangePNG []byte
+	//go:embed img/wall_left.png
+	WallLeftPNG []byte
+	//go:embed img/wall_right.png
+	WallRightPNG []byte
+	//go:embed img/fir_right.png
+	FirRightPNG []byte
+	//go:embed img/fir_left.png
+	FirLeftPNG []byte
+	//go:embed img/moon.png
+	MoonPNG []byte
 	//go:embed img/tombstone1.png
 	Tombstone1PNG []byte
 	//go:embed img/tombstone2.png
@@ -49,6 +59,11 @@ var (
 	Tombstone1Image *ebiten.Image
 	Tombstone2Image *ebiten.Image
 	Tombstone3Image *ebiten.Image
+	WallLeftImage  *ebiten.Image
+	WallRightImage *ebiten.Image
+	FirRightImage  *ebiten.Image
+	FirLeftImage   *ebiten.Image
+	MoonImage      *ebiten.Image
 )
 
 func init() {
@@ -69,6 +84,21 @@ func init() {
 
 	orangeImg, _, _ := image.Decode(bytes.NewReader(OrangePNG))
 	OrangeImage = ebiten.NewImageFromImage(orangeImg)
+
+	wallLeftImg, _, _ := image.Decode(bytes.NewReader(WallLeftPNG))
+	WallLeftImage = ebiten.NewImageFromImage(wallLeftImg)
+
+	wallRightImg, _, _ := image.Decode(bytes.NewReader(WallRightPNG))
+	WallRightImage = ebiten.NewImageFromImage(wallRightImg)
+
+	firRightImg, _, _ := image.Decode(bytes.NewReader(FirRightPNG))
+	FirRightImage = ebiten.NewImageFromImage(firRightImg)
+
+	firLeftImg, _, _ := image.Decode(bytes.NewReader(FirLeftPNG))
+	FirLeftImage = ebiten.NewImageFromImage(firLeftImg)
+
+	moonImg, _, _ := image.Decode(bytes.NewReader(MoonPNG))
+	MoonImage = ebiten.NewImageFromImage(moonImg)
 
 	tombstone1Img, _, _ := image.Decode(bytes.NewReader(Tombstone1PNG))
 	Tombstone1Image = ebiten.NewImageFromImage(tombstone1Img)
@@ -176,6 +206,19 @@ func CreateSpike(w *ecs.World, x, y float64, repeat components.Repeatable) ecs.E
 	w.SetComponent(entity, components.StaticBody())
 
 	ApplyRepeatable(w, entity)
+
+	return entity
+}
+
+func CreateExteriorObject(w *ecs.World, x, y float64, img *ebiten.Image) ecs.EntityID {
+	entity := w.CreateEntity()
+	w.SetComponent(entity, components.Position{
+		Vector: linalg.Vector2{X: x, Y: y},
+	})
+	w.SetComponent(entity, components.Sprite{
+		Image: img,
+	})
+	w.SetComponent(entity, components.StaticBody())
 
 	return entity
 }
@@ -335,8 +378,13 @@ func CreateCannon(w *ecs.World, x, y float64, direction float64) ecs.EntityID {
 	img := ebiten.NewImage(size, size)
 	img.Fill(color.RGBA{40, 40, 40, 255})
 	w.SetComponent(entity, components.Sprite{
-		Image: img,
+		Image:  img,
+		ZIndex: 10,
 	})
+	w.SetComponent(entity, components.Collision{
+		Shape: resolv.NewRectangleFromTopLeft(x, y+16, 16, 16),
+	})
+	w.SetComponent(entity, components.StaticBody())
 
 	cannon := components.DefaultCannon()
 	cannon.Direction = direction
