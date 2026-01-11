@@ -10,4 +10,5 @@ const (
 	SoundCannonShot
 	SoundProjectileHit
 	SoundDeath
+	SoundGameOver
 )

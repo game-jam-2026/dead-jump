@@ -11,6 +11,7 @@ import (
 	"github.com/game-jam-2026/dead-jump/internal/ecs/systems"
 	"github.com/game-jam-2026/dead-jump/internal/menu"
 	"github.com/game-jam-2026/dead-jump/internal/physics"
+	"github.com/game-jam-2026/dead-jump/internal/utils/audio"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -37,6 +38,10 @@ func NewGame() *Game {
 	}
 	g.menu.OnResume = func() {
 		g.menu.SetState(menu.StatePlaying)
+	}
+	g.menu.OnMainMenu = func() {
+		g.w = nil
+		g.menu.SetState(menu.StateMenu)
 	}
 	g.menu.OnQuit = func() {
 		os.Exit(0)
@@ -91,8 +96,37 @@ func (g *Game) updateGame() {
 	systems.UpdateProjectileLifetime(g.w)
 	systems.CleanupOffscreenProjectiles(g.w, assets.WorldWidth, assets.WorldHeight)
 	systems.DrawLifeCounter(g.w)
+
+	g.checkGameOver()
+
 	g.updateCameraTarget()
 	systems.UpdateCameraSystem(g.w)
+}
+
+func (g *Game) checkGameOver() {
+	if g.menu.GetState() == menu.StateGameOver {
+		return
+	}
+
+	lifeEntities := g.w.GetEntities(
+		reflect.TypeOf((*components.Life)(nil)).Elem(),
+	)
+
+	if len(lifeEntities) == 0 {
+		audio.Play(audio.SoundGameOver)
+		g.menu.SetState(menu.StateGameOver)
+		return
+	}
+
+	life, err := ecs.GetComponent[components.Life](g.w, lifeEntities[0])
+	if err != nil {
+		return
+	}
+
+	if life.Count <= 0 {
+		audio.Play(audio.SoundGameOver)
+		g.menu.SetState(menu.StateGameOver)
+	}
 }
 
 func (g *Game) updateCameraTarget() {
