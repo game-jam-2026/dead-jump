@@ -21,6 +21,8 @@ import (
 var (
 	//go:embed img/hero.png
 	HeroPNG []byte
+	//go:embed img/hero_jump.png
+	HeroJumpPNG []byte
 	//go:embed img/dead_hero.png
 	DeadHeroPNG []byte
 	//go:embed img/spike.png
@@ -33,6 +35,7 @@ var (
 
 var (
 	HeroImage     *ebiten.Image
+	HeroJumpImage *ebiten.Image
 	DeadHeroImage *ebiten.Image
 	SpikeImage    *ebiten.Image
 	GroundImage   *ebiten.Image
@@ -42,6 +45,9 @@ var (
 func init() {
 	heroImg, _, _ := image.Decode(bytes.NewReader(HeroPNG))
 	HeroImage = ebiten.NewImageFromImage(heroImg)
+
+	heroJumpImg, _, _ := image.Decode(bytes.NewReader(HeroJumpPNG))
+	HeroJumpImage = ebiten.NewImageFromImage(heroJumpImg)
 
 	deadHeroImg, _, _ := image.Decode(bytes.NewReader(DeadHeroPNG))
 	DeadHeroImage = ebiten.NewImageFromImage(deadHeroImg)
@@ -65,16 +71,28 @@ func CreateCharacter(w *ecs.World, x, y float64, scale float64) ecs.EntityID {
 	width := origW * scale
 	height := origH * scale
 
-	scaledImg := ebiten.NewImage(int(width), int(height))
+	groundedSprite := ebiten.NewImage(int(width), int(height))
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Scale(scale, scale)
-	scaledImg.DrawImage(HeroImage, op)
+	groundedSprite.DrawImage(HeroImage, op)
+
+	// jumping sprite
+	jumpBounds := HeroJumpImage.Bounds()
+	jumpOrigW := float64(jumpBounds.Dx())
+	jumpOrigH := float64(jumpBounds.Dy())
+	jumpWidth := jumpOrigW * scale
+	jumpHeight := jumpOrigH * scale
+
+	jumpingSprite := ebiten.NewImage(int(jumpWidth), int(jumpHeight))
+	opJump := &ebiten.DrawImageOptions{}
+	opJump.GeoM.Scale(scale, scale)
+	jumpingSprite.DrawImage(HeroJumpImage, opJump)
 
 	w.SetComponent(entity, components.Position{
 		Vector: linalg.Vector2{X: x, Y: y},
 	})
 	w.SetComponent(entity, components.Sprite{
-		Image: scaledImg,
+		Image: groundedSprite,
 	})
 	w.SetComponent(entity, components.Collision{
 		Shape: resolv.NewRectangleFromTopLeft(x, y, width, height),
@@ -91,7 +109,10 @@ func CreateCharacter(w *ecs.World, x, y float64, scale float64) ecs.EntityID {
 	body.MaxSpeed = 20.0
 	w.SetComponent(entity, body)
 
-	w.SetComponent(entity, components.Character{})
+	w.SetComponent(entity, components.Character{
+		GroundedSprite: groundedSprite,
+		JumpingSprite:  jumpingSprite,
+	})
 
 	return entity
 }

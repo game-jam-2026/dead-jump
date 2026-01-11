@@ -23,7 +23,7 @@ func LoadLoreDumpLevel() *ecs.World {
 	levelHeight := 240.0
 
 	CreateStartPoint(w, 30, 150)
-	playerID := CreateCharacter(w, 30, 150, 0.5)
+	playerID := CreateCharacter(w, 30, 150, 1)
 
 	CreateGround(w, 0, 210, 24, 24, components.Repeatable{
 		Direction: linalg.Vector2{X: 1},

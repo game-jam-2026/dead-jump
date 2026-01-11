@@ -13,7 +13,7 @@ func LoadLevel1() *ecs.World {
 	CreateLifeCounter(w, 3)
 	CreateStartPoint(w, 20, 50)
 
-	playerID := CreateCharacter(w, 20, 50, 0.5)
+	playerID := CreateCharacter(w, 20, 50, 1)
 
 	CreateGround(w, 0, 210, 24, 24, components.Repeatable{
 		Direction: linalg.Vector2{X: 1},

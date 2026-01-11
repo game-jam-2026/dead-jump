@@ -30,6 +30,9 @@ var spikeDeath2MP3 []byte
 //go:embed sfx/gameOver.mp3
 var gameOverMP3 []byte
 
+//go:embed sfx/helll-yeahhh.mp3
+var victoryMP3 []byte
+
 //go:embed music/flex.mp3
 var levelMusicMP3 []byte
 
@@ -66,8 +69,9 @@ func InitAudio() {
 
 	_ = audio.RegisterMP3(audio.SoundDeath, spikeDeath1MP3)
 	_ = audio.RegisterMP3(audio.SoundDeath, spikeDeath2MP3)
-	_ = audio.RegisterMP3(audio.SoundGameOver, gameOverMP3)
+	_ = audio.RegisterMusicMP3(audio.SoundGameOver, gameOverMP3)
 
+	_ = audio.RegisterMusicMP3(audio.SoundVictory, victoryMP3)
 	_ = audio.RegisterMusicMP3(audio.SoundLevelMusic, levelMusicMP3)
 
 	_ = audio.RegisterMP3(audio.SoundStep, step1MP3)

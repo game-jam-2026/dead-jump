@@ -34,7 +34,7 @@ func ApplySpikes(world *ecs.World) bool {
 
 			intersection := charCollision.Shape.Intersection(spikeCollision.Shape)
 			if !intersection.IsEmpty() {
-				utils.KillEntity(world, charEntity, assets.DeadHeroImage, 0.5, assets.CreateCharacter)
+				utils.KillEntity(world, charEntity, assets.DeadHeroImage, 1, assets.CreateCharacter)
 				return true // Death occurred
 			}
 		}
