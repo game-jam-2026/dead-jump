@@ -13,7 +13,6 @@ import (
 	"github.com/game-jam-2026/dead-jump/internal/menu"
 	"github.com/game-jam-2026/dead-jump/internal/physics"
 	"github.com/game-jam-2026/dead-jump/internal/utils"
-	"github.com/game-jam-2026/dead-jump/internal/utils/audio"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -95,6 +94,7 @@ func (g *Game) Update() error {
 
 func (g *Game) updateGame() {
 	systems.MoveCharacter(g.w)
+	systems.UpdateCharacterSprite(g.w)
 	systems.UpdateCannons(g.w)
 
 	cfg, _ := ecs.GetResource[physics.Config](g.w)
@@ -133,8 +133,7 @@ func (g *Game) checkGameOver() {
 	)
 
 	if len(lifeEntities) == 0 {
-		audio.Play(audio.SoundGameOver)
-		g.menu.SetState(menu.StateGameOver)
+		g.menu.ShowGameOver()
 		return
 	}
 
@@ -144,8 +143,7 @@ func (g *Game) checkGameOver() {
 	}
 
 	if life.Count <= 0 {
-		audio.Play(audio.SoundGameOver)
-		g.menu.SetState(menu.StateGameOver)
+		g.menu.ShowGameOver()
 	}
 }
 

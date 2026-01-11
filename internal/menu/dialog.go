@@ -1,10 +1,14 @@
 package menu
 
-import "github.com/hajimehoshi/ebiten/v2/inpututil"
+import (
+	"github.com/game-jam-2026/dead-jump/internal/utils/audio"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
+)
 
 func (m *Menu) ShowLevelComplete() {
 	m.state = StateLevelComplete
 	m.selectedIndex = 0
+	audio.RestartMusic(audio.SoundVictory)
 	if m.OnLevelComplete != nil {
 		m.OnLevelComplete()
 	}
@@ -13,6 +17,7 @@ func (m *Menu) ShowLevelComplete() {
 func (m *Menu) ShowGameOver() {
 	m.state = StateGameOver
 	m.selectedIndex = 0
+	audio.RestartMusic(audio.SoundGameOver)
 	if m.OnGameOver != nil {
 		m.OnGameOver()
 	}

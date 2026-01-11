@@ -52,7 +52,7 @@ func KillEntity(
 		Image: scaledImg,
 	})
 
-	newPosY := pos.Vector.Y + 12
+	newPosY := pos.Vector.Y + 10
 
 	w.SetComponent(entity, components.Collision{
 		Shape: resolv.NewRectangleFromTopLeft(pos.Vector.X, newPosY, width, height),

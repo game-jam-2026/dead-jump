@@ -26,18 +26,33 @@ func (m *Menu) stopMusic() {
 }
 
 func (m *Menu) updateMusicState() {
-	shouldPlay := m.shouldPlayMusic() && !audio.IsMuted()
+	shouldPlayMenu := m.shouldPlayMenuMusic() && !audio.IsMuted()
+	shouldPlayVictory := m.state == StateLevelComplete && !audio.IsMuted()
+	shouldPlayGameOver := m.state == StateGameOver && !audio.IsMuted()
 
-	if shouldPlay && !audio.IsMusicPlaying(audio.SoundMenuMusic) {
+	if shouldPlayMenu && !audio.IsMusicPlaying(audio.SoundMenuMusic) {
 		audio.PlayMusic(audio.SoundMenuMusic)
-	} else if !shouldPlay && audio.IsMusicPlaying(audio.SoundMenuMusic) {
+	} else if !shouldPlayMenu && audio.IsMusicPlaying(audio.SoundMenuMusic) {
 		audio.StopMusic(audio.SoundMenuMusic)
+	}
+
+	// HELL YEAAAH BROTHER AND SISTERS HELL YEAAAH
+	if shouldPlayVictory && !audio.IsMusicPlaying(audio.SoundVictory) {
+		audio.PlayMusic(audio.SoundVictory)
+	} else if !shouldPlayVictory && audio.IsMusicPlaying(audio.SoundVictory) {
+		audio.StopMusic(audio.SoundVictory)
+	}
+
+	if shouldPlayGameOver && !audio.IsMusicPlaying(audio.SoundGameOver) {
+		audio.PlayMusic(audio.SoundGameOver)
+	} else if !shouldPlayGameOver && audio.IsMusicPlaying(audio.SoundGameOver) {
+		audio.StopMusic(audio.SoundGameOver)
 	}
 
 	audio.UpdateMusicVolume()
 }
 
-func (m *Menu) shouldPlayMusic() bool {
+func (m *Menu) shouldPlayMenuMusic() bool {
 	switch m.state {
 	case StateMenu:
 		return true

@@ -23,7 +23,7 @@ func LoadPhysicsTestLevel() *ecs.World {
 	CreateAudioManager(w)
 
 	CreateStartPoint(w, 50, 300)
-	playerID := CreateCharacter(w, 50, 300, 0.5)
+	playerID := CreateCharacter(w, 50, 300, 1)
 
 	createPlatform(w, 0, 350, 100, 16, components.SurfaceNormal, color.RGBA{100, 100, 100, 255})
 	createPlatform(w, 100, 350, 80, 16, components.SurfaceIce, color.RGBA{200, 220, 255, 255})

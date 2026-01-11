@@ -149,6 +149,20 @@ func StopMusic(id SoundID) {
 	}
 }
 
+func RestartMusic(id SoundID) {
+	if defaultManager == nil {
+		return
+	}
+	player := defaultManager.musicPlayers[id]
+	if player != nil {
+		player.Rewind()
+		if !defaultManager.muted {
+			player.SetVolume(GetEffectiveMusicVolume())
+			player.Play()
+		}
+	}
+}
+
 func IsMusicPlaying(id SoundID) bool {
 	if defaultManager == nil {
 		return false

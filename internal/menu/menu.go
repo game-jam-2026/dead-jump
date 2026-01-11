@@ -112,18 +112,21 @@ func (m *Menu) initConfirmItems() {
 func (m *Menu) initLevelCompleteItems() {
 	m.levelCompleteItems = []MenuItem{
 		{Text: "NEXT LEVEL", Action: func() {
+			audio.StopMusic(audio.SoundVictory)
 			if m.OnNextLevel != nil {
 				m.OnNextLevel()
 			}
 			m.SetState(StatePlaying)
 		}},
 		{Text: "RESTART", Action: func() {
+			audio.StopMusic(audio.SoundVictory)
 			if m.OnRestart != nil {
 				m.OnRestart()
 			}
 			m.SetState(StatePlaying)
 		}},
 		{Text: "MAIN MENU", Action: func() {
+			audio.StopMusic(audio.SoundVictory)
 			if m.OnMainMenu != nil {
 				m.OnMainMenu()
 			}
@@ -136,12 +139,14 @@ func (m *Menu) initLevelCompleteItems() {
 func (m *Menu) initGameOverItems() {
 	m.gameOverItems = []MenuItem{
 		{Text: "TRY AGAIN", Action: func() {
+			audio.StopMusic(audio.SoundGameOver)
 			if m.OnRestart != nil {
 				m.OnRestart()
 			}
 			m.SetState(StatePlaying)
 		}},
 		{Text: "MAIN MENU", Action: func() {
+			audio.StopMusic(audio.SoundGameOver)
 			if m.OnMainMenu != nil {
 				m.OnMainMenu()
 			}
