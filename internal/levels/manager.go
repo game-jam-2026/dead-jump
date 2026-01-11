@@ -11,6 +11,7 @@ var LevelSequence = []LevelLoader{
 	assets.LoadLoreDumpLevel,
 	assets.LoadLevel1,
 	assets.LoadTowerLevel,
+	assets.LoadLevel3,
 	assets.LoadPhysicsTestLevel,
 }
 
