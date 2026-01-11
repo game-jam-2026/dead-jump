@@ -27,6 +27,9 @@ var spikeDeath1MP3 []byte
 //go:embed sfx/spikeDeath2.mp3
 var spikeDeath2MP3 []byte
 
+//go:embed sfx/gameOver.mp3
+var gameOverMP3 []byte
+
 func InitAudio() {
 	audio.Init()
 
@@ -39,4 +42,5 @@ func InitAudio() {
 
 	_ = audio.RegisterMP3(audio.SoundDeath, spikeDeath1MP3)
 	_ = audio.RegisterMP3(audio.SoundDeath, spikeDeath2MP3)
+	_ = audio.RegisterMP3(audio.SoundGameOver, gameOverMP3)
 }

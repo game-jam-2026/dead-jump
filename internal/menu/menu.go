@@ -148,11 +148,6 @@ func (m *Menu) initGameOverItems() {
 			m.state = StateMenu
 			m.selectedIndex = 0
 		}},
-		{Text: "QUIT", Action: func() {
-			if m.OnQuit != nil {
-				m.OnQuit()
-			}
-		}},
 	}
 }
 
