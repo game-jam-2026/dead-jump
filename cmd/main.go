@@ -58,6 +58,10 @@ func NewGame() *Game {
 	g.menu.OnQuit = func() {
 		os.Exit(0)
 	}
+	g.menu.OnEpilogueComplete = func() {
+		g.levelManager.Reset()
+		g.w = g.levelManager.StartGame()
+	}
 
 	return g
 }
@@ -81,7 +85,7 @@ func (g *Game) Update() error {
 
 	// Update based on state
 	switch state {
-	case menu.StateMenu, menu.StatePaused, menu.StateConfirmRestart, menu.StateSettings, menu.StateLevelComplete, menu.StateGameOver:
+	case menu.StateMenu, menu.StatePaused, menu.StateConfirmRestart, menu.StateSettings, menu.StateLevelComplete, menu.StateGameOver, menu.StateEpilogueEnding:
 		g.menu.Update()
 	case menu.StatePlaying:
 		if g.w != nil {
@@ -111,6 +115,11 @@ func (g *Game) updateGame() {
 	systems.UpdateProjectileLifetime(g.w)
 	systems.CleanupOffscreenProjectiles(g.w, assets.WorldWidth, assets.WorldHeight)
 	systems.DrawLifeCounter(g.w)
+
+	if systems.ApplyEpilogueFinish(g.w) {
+		g.menu.ShowEpilogueEnding()
+		return
+	}
 
 	if systems.ApplyLevelFinish(g.w) {
 		g.menu.ShowLevelComplete()
@@ -182,6 +191,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			utils.DrawLoreText(g.w, screen)
 		}
 		// Draw menu overlay
+		g.menu.Draw(screen)
+	case menu.StateEpilogueEnding:
 		g.menu.Draw(screen)
 	}
 }

@@ -23,6 +23,12 @@ func (m *Menu) ShowGameOver() {
 	}
 }
 
+func (m *Menu) ShowEpilogueEnding() {
+	m.state = StateEpilogueEnding
+	m.selectedIndex = 0
+	m.epilogueTimer = 0
+}
+
 func (m *Menu) ShowDialog(title, message string, buttons []MenuItem) {
 	m.activeDialog = &Dialog{
 		Title:    title,

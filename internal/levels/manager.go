@@ -13,6 +13,7 @@ var LevelSequence = []LevelLoader{
 	assets.LoadLevel2,
 	assets.Load2CannonsLevel,
 	assets.LoadTowerLevel,
+	assets.LoadEpilogueLevel,
 }
 
 type Manager struct {

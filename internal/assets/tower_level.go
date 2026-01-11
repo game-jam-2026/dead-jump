@@ -15,7 +15,7 @@ func LoadTowerLevel() *ecs.World {
 	CreateLifeCounter(w, 3)
 	CreateStartPoint(w, 40, 530)
 
-	playerID := CreateCharacter(w, 40, 530, 0.5)
+	playerID := CreateCharacter(w, 40, 530, 1)
 
 	CreateSpike(w, 0, 584, components.Repeatable{
 		Direction: linalg.Vector2{X: 1},
