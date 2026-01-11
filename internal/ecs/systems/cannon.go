@@ -57,9 +57,9 @@ func UpdateCannons(world *ecs.World) {
 }
 
 func fireProjectile(world *ecs.World, pos *components.Position, cannon *components.Cannon) {
-	spawnDistance := float64(12)
-	cannonCenterX := pos.Vector.X + 8
-	cannonCenterY := pos.Vector.Y + 4
+	spawnDistance := float64(28)
+	cannonCenterX := pos.Vector.X + 16
+	cannonCenterY := pos.Vector.Y + 16
 
 	spawnX := cannonCenterX + math.Cos(cannon.Direction)*spawnDistance
 	spawnY := cannonCenterY + math.Sin(cannon.Direction)*spawnDistance
@@ -138,8 +138,9 @@ func HandleProjectileCollisions(world *ecs.World, collisions []CollisionResult) 
 			continue
 		}
 
-		_, isScreenSpace := ecs.GetComponent[components.ScreenSpace](world, targetID)
-		if isScreenSpace == nil {
+		// Skip collision with screen-space entities (like life counter UI)
+		_, err := ecs.GetComponent[components.ScreenSpace](world, targetID)
+		if err == nil {
 			continue
 		}
 
