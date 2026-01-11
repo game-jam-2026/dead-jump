@@ -54,6 +54,7 @@ const (
 	StateSettings
 	StateLevelComplete
 	StateGameOver
+	StateEpilogueEnding
 )
 
 type SubtitlePhase int
@@ -145,15 +146,19 @@ type Menu struct {
 	levelCompleteItems []MenuItem
 	gameOverItems      []MenuItem
 
+	epilogueItems []MenuItem
+	epilogueTimer int
+
 	// Callbacks
-	OnStartGame     func()
-	OnRestart       func()
-	OnQuit          func()
-	OnResume        func()
-	OnNextLevel     func()
-	OnLevelComplete func()
-	OnGameOver      func()
-	OnMainMenu      func()
+	OnStartGame        func()
+	OnRestart          func()
+	OnQuit             func()
+	OnResume           func()
+	OnNextLevel        func()
+	OnLevelComplete    func()
+	OnGameOver         func()
+	OnMainMenu         func()
+	OnEpilogueComplete func()
 }
 
 var (

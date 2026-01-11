@@ -38,6 +38,7 @@ func NewMenu() *Menu {
 	m.initSettingsItems()
 	m.initLevelCompleteItems()
 	m.initGameOverItems()
+	m.initEpilogueItems()
 
 	m.loadAssets()
 	m.spawnInitialObjects()
@@ -156,6 +157,17 @@ func (m *Menu) initGameOverItems() {
 	}
 }
 
+func (m *Menu) initEpilogueItems() {
+	m.epilogueItems = []MenuItem{
+		{Text: "CONTINUE", Action: func() {
+			if m.OnEpilogueComplete != nil {
+				m.OnEpilogueComplete()
+			}
+			m.SetState(StatePlaying)
+		}},
+	}
+}
+
 func (m *Menu) initSettingsItems() {
 	m.settingsItems = []MenuItem{
 		{Text: m.getMasterVolumeText(), Action: func() {}},
@@ -246,6 +258,11 @@ func (m *Menu) Update() {
 		return
 	}
 
+	if m.state == StateEpilogueEnding {
+		m.updateEpilogue()
+		return
+	}
+
 	items := m.getActiveItems()
 	if items == nil {
 		return
@@ -255,6 +272,19 @@ func (m *Menu) Update() {
 	m.handleVolumeAdjustment()
 	m.handleConfirmAction(items)
 	m.handleEscapeKey()
+}
+
+func (m *Menu) updateEpilogue() {
+	m.epilogueTimer++
+
+	if m.epilogueTimer > 60 {
+		if inpututil.IsKeyJustPressed(keyEnter) || inpututil.IsKeyJustPressed(keySpace) {
+			m.playConfirmSound()
+			if len(m.epilogueItems) > 0 && m.epilogueItems[0].Action != nil {
+				m.epilogueItems[0].Action()
+			}
+		}
+	}
 }
 
 func (m *Menu) updateScreenShake() {
@@ -323,6 +353,8 @@ func (m *Menu) getActiveItems() []MenuItem {
 		return m.levelCompleteItems
 	case StateGameOver:
 		return m.gameOverItems
+	case StateEpilogueEnding:
+		return m.epilogueItems
 	case StatePlaying:
 		return nil
 	default:
