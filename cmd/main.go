@@ -9,8 +9,10 @@ import (
 	"github.com/game-jam-2026/dead-jump/internal/ecs"
 	"github.com/game-jam-2026/dead-jump/internal/ecs/components"
 	"github.com/game-jam-2026/dead-jump/internal/ecs/systems"
+	"github.com/game-jam-2026/dead-jump/internal/levels"
 	"github.com/game-jam-2026/dead-jump/internal/menu"
 	"github.com/game-jam-2026/dead-jump/internal/physics"
+	"github.com/game-jam-2026/dead-jump/internal/utils"
 	"github.com/game-jam-2026/dead-jump/internal/utils/audio"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -18,8 +20,9 @@ import (
 )
 
 type Game struct {
-	w    *ecs.World
-	menu *menu.Menu
+	w            *ecs.World
+	menu         *menu.Menu
+	levelManager *levels.Manager
 }
 
 func NewGame() *Game {
@@ -28,19 +31,29 @@ func NewGame() *Game {
 	// Initialize audio context and register all sounds
 	assets.InitAudio()
 
+	g.levelManager = levels.NewManager()
+
 	g.menu = menu.NewMenu()
 	g.menu.OnStartGame = func() {
-		g.w = assets.LoadLevel1()
+		g.w = g.levelManager.StartGame()
 		g.menu.SetState(menu.StatePlaying)
 	}
 	g.menu.OnRestart = func() {
-		g.w = assets.LoadLevel1()
+		g.w = g.levelManager.RestartLevel()
+	}
+	g.menu.OnNextLevel = func() {
+		g.w = g.levelManager.NextLevel()
+		if g.w == nil {
+			g.menu.SetState(menu.StateMenu)
+			g.levelManager.Reset()
+		}
 	}
 	g.menu.OnResume = func() {
 		g.menu.SetState(menu.StatePlaying)
 	}
 	g.menu.OnMainMenu = func() {
 		g.w = nil
+		g.levelManager.Reset()
 		g.menu.SetState(menu.StateMenu)
 	}
 	g.menu.OnQuit = func() {
@@ -99,6 +112,11 @@ func (g *Game) updateGame() {
 	systems.CleanupOffscreenProjectiles(g.w, assets.WorldWidth, assets.WorldHeight)
 	systems.DrawLifeCounter(g.w)
 
+	if systems.ApplyLevelFinish(g.w) {
+		g.menu.ShowLevelComplete()
+		return
+	}
+
 	g.checkGameOver()
 
 	g.updateCameraTarget()
@@ -156,12 +174,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		if g.w != nil {
 			camera, _ := ecs.GetResource[components.Camera](g.w)
 			systems.DrawSpritesWithCamera(g.w, screen, camera)
+			utils.DrawLoreText(g.w, screen)
 		}
 	case menu.StatePaused, menu.StateConfirmRestart, menu.StateSettings, menu.StateLevelComplete, menu.StateGameOver:
 		// Draw game underneath if exists
 		if g.w != nil {
 			camera, _ := ecs.GetResource[components.Camera](g.w)
 			systems.DrawSpritesWithCamera(g.w, screen, camera)
+			utils.DrawLoreText(g.w, screen)
 		}
 		// Draw menu overlay
 		g.menu.Draw(screen)
