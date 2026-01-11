@@ -53,6 +53,8 @@ func NewGame() *Game {
 func (g *Game) Update() error {
 	state := g.menu.GetState()
 
+	systems.UpdateLevelMusic(state)
+
 	// Handle ESC key
 	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
 		switch state {

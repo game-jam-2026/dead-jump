@@ -8,13 +8,17 @@ import (
 
 	"github.com/game-jam-2026/dead-jump/internal/ecs"
 	"github.com/game-jam-2026/dead-jump/internal/ecs/components"
+	"github.com/game-jam-2026/dead-jump/internal/utils/audio"
 	"github.com/game-jam-2026/dead-jump/pkg/linalg"
 )
 
 const (
-	MoveSpeed = 0.5
-	JumpForce = 6.0
+	MoveSpeed         = 0.5
+	JumpForce         = 6.0
+	StepSoundCooldown = 10
 )
+
+var stepSoundTimer int
 
 func MoveCharacter(w *ecs.World) {
 	entities := w.GetEntities(
@@ -39,11 +43,22 @@ func MoveCharacter(w *ecs.World) {
 		return
 	}
 
-	if ebiten.IsKeyPressed(ebiten.KeyLeft) || ebiten.IsKeyPressed(ebiten.KeyA) {
+	isMovingLeft := ebiten.IsKeyPressed(ebiten.KeyLeft) || ebiten.IsKeyPressed(ebiten.KeyA)
+	isMovingRight := ebiten.IsKeyPressed(ebiten.KeyRight) || ebiten.IsKeyPressed(ebiten.KeyD)
+
+	if isMovingLeft {
 		body.AddForce(linalg.Vector2{X: -MoveSpeed * body.Mass, Y: 0})
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyRight) || ebiten.IsKeyPressed(ebiten.KeyD) {
+	if isMovingRight {
 		body.AddForce(linalg.Vector2{X: MoveSpeed * body.Mass, Y: 0})
+	}
+
+	if stepSoundTimer > 0 {
+		stepSoundTimer--
+	}
+	if body.IsGrounded && (isMovingLeft || isMovingRight) && stepSoundTimer == 0 {
+		audio.Play(audio.SoundStep)
+		stepSoundTimer = StepSoundCooldown
 	}
 
 	if body.IsGrounded && (inpututil.IsKeyJustPressed(ebiten.KeySpace) || inpututil.IsKeyJustPressed(ebiten.KeyW) || inpututil.IsKeyJustPressed(ebiten.KeyUp)) {
