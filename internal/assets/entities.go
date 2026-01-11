@@ -406,7 +406,7 @@ func CreateCannon(w *ecs.World, x, y float64, direction float64, position int) e
 		ZIndex: 3,
 	})
 	w.SetComponent(entity, components.Collision{
-		Shape: resolv.NewRectangleFromTopLeft(x, y+32, 32, 32),
+		Shape: resolv.NewRectangleFromTopLeft(x, y, 32, 32),
 	})
 	w.SetComponent(entity, components.StaticBody())
 

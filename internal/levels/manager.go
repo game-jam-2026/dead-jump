@@ -11,9 +11,9 @@ var LevelSequence = []LevelLoader{
 	assets.LoadLoreDumpLevel,
 	assets.LoadLevel1,
 	assets.LoadLevel2,
+	assets.Load2CannonsLevel,
 	assets.LoadTowerLevel,
 	assets.LoadEpilogueLevel,
-	//assets.LoadPhysicsTestLevel,
 }
 
 type Manager struct {
