@@ -73,7 +73,7 @@ func Load2CannonsLevel() *ecs.World {
 		CreateDecoration(w, 416, 48, TileTree)
 	}
 
-	CreateLevelFinish(w, 432, 55)
+	CreateLevelFinish(w, 242, 155)
 
 	if TileColumn != nil {
 		for i := 0; i < 23; i++ {
