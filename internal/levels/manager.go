@@ -10,8 +10,9 @@ type LevelLoader func() *ecs.World
 var LevelSequence = []LevelLoader{
 	assets.LoadLoreDumpLevel,
 	assets.LoadLevel1,
-	assets.LoadTowerLevel,
 	assets.LoadLevel3,
+	assets.Load2CannonsLevel,
+	assets.LoadTowerLevel,
 	assets.LoadPhysicsTestLevel,
 }
 

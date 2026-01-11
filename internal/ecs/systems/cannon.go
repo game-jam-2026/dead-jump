@@ -31,29 +31,46 @@ func UpdateCannons(world *ecs.World) {
 			continue
 		}
 
-		cannon.FramesSinceLastShot++
+		if cannon.CurrentBurst > 0 {
+			cannon.FramesSinceLastBurst++
 
-		if cannon.FramesSinceLastShot >= cannon.FireRate {
-			cannon.FramesSinceLastShot = 0
-
-			spawnDistance := float64(12)
-			cannonCenterX := pos.Vector.X + 8
-			cannonCenterY := pos.Vector.Y + 4
-
-			spawnX := cannonCenterX + math.Cos(cannon.Direction)*spawnDistance
-			spawnY := cannonCenterY + math.Sin(cannon.Direction)*spawnDistance
-
-			velocity := linalg.Vector2{
-				X: math.Cos(cannon.Direction) * cannon.ProjectileSpeed,
-				Y: math.Sin(cannon.Direction) * cannon.ProjectileSpeed,
+			if cannon.FramesSinceLastBurst >= cannon.BurstDelay {
+				cannon.FramesSinceLastBurst = 0
+				fireProjectile(world, pos, cannon)
+				cannon.CurrentBurst--
 			}
+		} else {
+			cannon.FramesSinceLastShot++
 
-			spawnProjectile(world, spawnX, spawnY, velocity, cannon.ProjectileMass)
-			audio.Play(audio.SoundCannonShot)
+			if cannon.FramesSinceLastShot >= cannon.FireRate {
+				cannon.FramesSinceLastShot = 0
+				cannon.CurrentBurst = cannon.BurstCount
+				cannon.FramesSinceLastBurst = 0
+
+				fireProjectile(world, pos, cannon)
+				cannon.CurrentBurst--
+			}
 		}
 
 		world.SetComponent(e, *cannon)
 	}
+}
+
+func fireProjectile(world *ecs.World, pos *components.Position, cannon *components.Cannon) {
+	spawnDistance := float64(12)
+	cannonCenterX := pos.Vector.X + 8
+	cannonCenterY := pos.Vector.Y + 4
+
+	spawnX := cannonCenterX + math.Cos(cannon.Direction)*spawnDistance
+	spawnY := cannonCenterY + math.Sin(cannon.Direction)*spawnDistance
+
+	velocity := linalg.Vector2{
+		X: math.Cos(cannon.Direction) * cannon.ProjectileSpeed,
+		Y: math.Sin(cannon.Direction) * cannon.ProjectileSpeed,
+	}
+
+	spawnProjectile(world, spawnX, spawnY, velocity, cannon.ProjectileMass)
+	audio.Play(audio.SoundCannonShot)
 }
 
 func spawnProjectile(world *ecs.World, x, y float64, velocity linalg.Vector2, mass float64) ecs.EntityID {
@@ -88,7 +105,7 @@ func spawnProjectile(world *ecs.World, x, y float64, velocity linalg.Vector2, ma
 
 	world.SetComponent(projectile, components.Projectile{
 		ImpulseMagnitude:   mass * 3,
-		DestroyOnHit:       false,
+		DestroyOnHit:       true,
 		Lifetime:           300,
 		MinSpeedForImpulse: 0.5,
 	})
@@ -118,6 +135,11 @@ func HandleProjectileCollisions(world *ecs.World, collisions []CollisionResult) 
 		}
 
 		if proj.IsStationary {
+			continue
+		}
+
+		_, isScreenSpace := ecs.GetComponent[components.ScreenSpace](world, targetID)
+		if isScreenSpace == nil {
 			continue
 		}
 
