@@ -12,7 +12,7 @@ import (
 	"github.com/game-jam-2026/dead-jump/pkg/linalg"
 )
 
-const loreText = "You are a mage in a dying world. Your life is supported by the magic fruits, even if your body dies, making you to experience the same places over and over again. Try to find out what has happened by collecting warp fruits to traverse the world."
+const loreText = "You are a mage in a dying world. Your life is supported by the magic fruits, even if your body dies, you are revived, experiencing the same places over and over again. Try to find out what has happened by collecting warp fruits to traverse the world."
 
 func LoadLoreDumpLevel() *ecs.World {
 	w := ecs.NewWorld()

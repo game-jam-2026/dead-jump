@@ -7,6 +7,7 @@ import (
 
 	"github.com/game-jam-2026/dead-jump/internal/ecs"
 	"github.com/game-jam-2026/dead-jump/internal/ecs/components"
+	"github.com/game-jam-2026/dead-jump/pkg/linalg"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -105,11 +106,17 @@ func DrawSpritesWithCamera(world *ecs.World, screen *ebiten.Image, camera *compo
 		spriteWidth := float64(bounds.Dx())
 		spriteHeight := float64(bounds.Dy())
 
-		if !camera.IsVisible(pos.Vector, spriteWidth, spriteHeight) {
-			continue
-		}
+		_, isScreenSpace := ecs.GetComponent[components.ScreenSpace](world, e)
 
-		screenPos := camera.WorldToScreen(pos.Vector)
+		var screenPos linalg.Vector2
+		if isScreenSpace == nil {
+			screenPos = pos.Vector
+		} else {
+			if !camera.IsVisible(pos.Vector, spriteWidth, spriteHeight) {
+				continue
+			}
+			screenPos = camera.WorldToScreen(pos.Vector)
+		}
 
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Translate(screenPos.X, screenPos.Y)
