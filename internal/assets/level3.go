@@ -13,22 +13,22 @@ import (
 	"github.com/solarlune/resolv"
 )
 
-func LoadLevel3() *ecs.World {
+func LoadLevel2() *ecs.World {
 	w := ecs.NewWorld()
 	CreateAudioManager(w)
 	CreateLifeCounter(w, 3)
 	CreateStartPoint(w, 20, 50)
 
-	playerID := CreateCharacter(w, 10, 50, 1.0)
+	playerID := CreateCharacter(w, 10, 50, 1)
 
 	CreateGround(w, 0, 210, 24, 24, components.Repeatable{
 		Direction: linalg.Vector2{X: 1},
 		Count:     2,
 	})
-	CreateCannon(w, 42, 205, -math.Pi/2)
+	CreateCannon(w, 32, 180, -math.Pi/2, 0)
 
 	CreateExteriorObject(w, 220, 30, MoonImage)
-	CreateExteriorObject(w, 10, 162, FirLeftImage)
+	CreateExteriorObject(w, -10, 162, FirLeftImage)
 	CreateExteriorObject(w, 128, 100, FirLeftImage)
 	CreateExteriorObject(w, 160, 100, FirRightImage)
 

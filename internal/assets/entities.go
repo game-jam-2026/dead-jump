@@ -5,7 +5,6 @@ import (
 	_ "embed"
 	"fmt"
 	"image"
-	"image/color"
 	_ "image/png"
 	"math"
 
@@ -47,23 +46,32 @@ var (
 	Tombstone2PNG []byte
 	//go:embed img/tombstone3.png
 	Tombstone3PNG []byte
+	//go:embed img/cannon_left.png
+	CannonLeftPNG []byte
+	//go:embed img/cannon_top.png
+	CannonTopPNG []byte
+	//go:embed img/cannon_right.png
+	CannonRightPNG []byte
 )
 
 var (
-	HeroImage       *ebiten.Image
-	HeroJumpImage *ebiten.Image
-	DeadHeroImage   *ebiten.Image
-	SpikeImage      *ebiten.Image
-	GroundImage     *ebiten.Image
-	OrangeImage     *ebiten.Image
-	Tombstone1Image *ebiten.Image
-	Tombstone2Image *ebiten.Image
-	Tombstone3Image *ebiten.Image
-	WallLeftImage  *ebiten.Image
-	WallRightImage *ebiten.Image
-	FirRightImage  *ebiten.Image
-	FirLeftImage   *ebiten.Image
-	MoonImage      *ebiten.Image
+	HeroImage        *ebiten.Image
+	HeroJumpImage    *ebiten.Image
+	DeadHeroImage    *ebiten.Image
+	SpikeImage       *ebiten.Image
+	GroundImage      *ebiten.Image
+	OrangeImage      *ebiten.Image
+	Tombstone1Image  *ebiten.Image
+	Tombstone2Image  *ebiten.Image
+	Tombstone3Image  *ebiten.Image
+	WallLeftImage    *ebiten.Image
+	WallRightImage   *ebiten.Image
+	FirRightImage    *ebiten.Image
+	FirLeftImage     *ebiten.Image
+	MoonImage        *ebiten.Image
+	CannonLeftImage  *ebiten.Image
+	CannonTopImage   *ebiten.Image
+	CannonRightImage *ebiten.Image
 )
 
 func init() {
@@ -108,6 +116,15 @@ func init() {
 
 	tombstone3Img, _, _ := image.Decode(bytes.NewReader(Tombstone3PNG))
 	Tombstone3Image = ebiten.NewImageFromImage(tombstone3Img)
+
+	cannonLeftImg, _, _ := image.Decode(bytes.NewReader(CannonLeftPNG))
+	CannonLeftImage = ebiten.NewImageFromImage(cannonLeftImg)
+
+	cannonTopImg, _, _ := image.Decode(bytes.NewReader(CannonTopPNG))
+	CannonTopImage = ebiten.NewImageFromImage(cannonTopImg)
+
+	cannonRightImg, _, _ := image.Decode(bytes.NewReader(CannonRightPNG))
+	CannonRightImage = ebiten.NewImageFromImage(cannonRightImg)
 }
 
 func CreateCharacter(w *ecs.World, x, y float64, scale float64) ecs.EntityID {
@@ -367,22 +384,30 @@ func ApplyRepeatable(w *ecs.World, entity ecs.EntityID) {
 	})
 }
 
-func CreateCannon(w *ecs.World, x, y float64, direction float64) ecs.EntityID {
+// CreateCannon position -1 - left, 0 - top, 1 - right
+func CreateCannon(w *ecs.World, x, y float64, direction float64, position int) ecs.EntityID {
 	entity := w.CreateEntity()
 
 	w.SetComponent(entity, components.Position{
 		Vector: linalg.Vector2{X: x, Y: y},
 	})
 
-	size := 16
-	img := ebiten.NewImage(size, size)
-	img.Fill(color.RGBA{40, 40, 40, 255})
+	var img *ebiten.Image
+	switch {
+	case position < 0:
+		img = CannonLeftImage
+	case position > 0:
+		img = CannonRightImage
+	default:
+		img = CannonTopImage
+	}
+
 	w.SetComponent(entity, components.Sprite{
 		Image:  img,
-		ZIndex: 10,
+		ZIndex: 3,
 	})
 	w.SetComponent(entity, components.Collision{
-		Shape: resolv.NewRectangleFromTopLeft(x, y+16, 16, 16),
+		Shape: resolv.NewRectangleFromTopLeft(x, y+32, 32, 32),
 	})
 	w.SetComponent(entity, components.StaticBody())
 

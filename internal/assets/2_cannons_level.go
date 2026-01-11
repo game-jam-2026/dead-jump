@@ -32,7 +32,7 @@ func Load2CannonsLevel() *ecs.World {
 
 	CreateTiledPlatform(w, 208, 336, 4, TileGroundGrass)
 
-	cannonEntity := CreateCannon(w, 224, 320, -math.Pi*3/4)
+	cannonEntity := CreateCannon(w, 224, 320, -math.Pi*3/4, -1)
 	cannon, _ := ecs.GetComponent[components.Cannon](w, cannonEntity)
 	cannon.BurstCount = 5
 	cannon.BurstDelay = 7
@@ -46,7 +46,7 @@ func Load2CannonsLevel() *ecs.World {
 		CreateDecoration(w, 40, 224, TileTree)
 	}
 
-	cannonEntityMidPl := CreateCannon(w, 62, 240, -math.Pi/5)
+	cannonEntityMidPl := CreateCannon(w, 62, 240, -math.Pi/5, 0)
 	cannonMidPl, _ := ecs.GetComponent[components.Cannon](w, cannonEntityMidPl)
 	cannonMidPl.BurstCount = 5
 	cannonMidPl.BurstDelay = 7
