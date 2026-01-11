@@ -95,8 +95,16 @@ func (m *Menu) drawStateContent(screen *ebiten.Image, shakeX, shakeY float64) {
 		m.drawLevelCompleteScreen(screen, shakeX, shakeY)
 	case StateGameOver:
 		m.drawGameOverScreen(screen, shakeX, shakeY)
+	case StateDifficultySelect:
+		m.drawDifficultySelectScreen(screen, shakeX, shakeY)
 	case StatePlaying:
 	}
+}
+
+func (m *Menu) drawDifficultySelectScreen(screen *ebiten.Image, shakeX, shakeY float64) {
+	centerX := float64(ScreenWidth) / 2
+	m.drawText(screen, "SELECT DIFFICULTY", centerX+shakeX, 90+shakeY, m.fontMedium, colorBloodRed, true)
+	m.drawMenuItems(screen, m.difficultyItems, 120, shakeX, shakeY)
 }
 
 func (m *Menu) drawHint(screen *ebiten.Image, shakeY float64) {

@@ -5,6 +5,7 @@ import (
 
 	"github.com/game-jam-2026/dead-jump/internal/ecs"
 	"github.com/game-jam-2026/dead-jump/internal/ecs/components"
+	"github.com/game-jam-2026/dead-jump/internal/game"
 	"github.com/game-jam-2026/dead-jump/internal/physics"
 	"github.com/game-jam-2026/dead-jump/pkg/linalg"
 )
@@ -73,7 +74,11 @@ func Load2CannonsLevel() *ecs.World {
 		CreateDecoration(w, 416, 48, TileTree)
 	}
 
-	CreateLevelFinish(w, 242, 155)
+	if game.IsEasyMode() {
+		CreateLevelFinish(w, 260, 172)
+	} else {
+		CreateLevelFinish(w, 432, 55)
+	}
 
 	if TileColumn != nil {
 		for i := 0; i < 23; i++ {

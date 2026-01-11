@@ -4,6 +4,7 @@ import (
 	"math"
 	"math/rand"
 
+	"github.com/game-jam-2026/dead-jump/internal/game"
 	"github.com/game-jam-2026/dead-jump/internal/utils/audio"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -39,6 +40,7 @@ func NewMenu() *Menu {
 	m.initLevelCompleteItems()
 	m.initGameOverItems()
 	m.initEpilogueItems()
+	m.initDifficultyItems()
 
 	m.loadAssets()
 	m.spawnInitialObjects()
@@ -50,9 +52,8 @@ func NewMenu() *Menu {
 func (m *Menu) initMenuItems() {
 	m.items = []MenuItem{
 		{Text: "START", Action: func() {
-			if m.OnStartGame != nil {
-				m.OnStartGame()
-			}
+			m.state = StateDifficultySelect
+			m.selectedIndex = 0
 		}},
 		{Text: "SETTINGS", Action: func() {
 			m.previousState = StateMenu
@@ -164,6 +165,27 @@ func (m *Menu) initEpilogueItems() {
 				m.OnEpilogueComplete()
 			}
 			m.SetState(StatePlaying)
+		}},
+	}
+}
+
+func (m *Menu) initDifficultyItems() {
+	m.difficultyItems = []MenuItem{
+		{Text: "EASY", Action: func() {
+			game.SetDifficulty(game.DifficultyEasy)
+			if m.OnStartGame != nil {
+				m.OnStartGame()
+			}
+		}},
+		{Text: "HARD", Action: func() {
+			game.SetDifficulty(game.DifficultyHard)
+			if m.OnStartGame != nil {
+				m.OnStartGame()
+			}
+		}},
+		{Text: "BACK", Action: func() {
+			m.state = StateMenu
+			m.selectedIndex = 0
 		}},
 	}
 }
@@ -355,6 +377,8 @@ func (m *Menu) getActiveItems() []MenuItem {
 		return m.gameOverItems
 	case StateEpilogueEnding:
 		return m.epilogueItems
+	case StateDifficultySelect:
+		return m.difficultyItems
 	case StatePlaying:
 		return nil
 	default:
@@ -416,6 +440,10 @@ func (m *Menu) handleEscapeKey() {
 	case StateSettings:
 		m.playSelectSound()
 		m.state = m.previousState
+		m.selectedIndex = 0
+	case StateDifficultySelect:
+		m.playSelectSound()
+		m.state = StateMenu
 		m.selectedIndex = 0
 	}
 }
