@@ -8,7 +8,7 @@ const (
 	DifficultyHard
 )
 
-var currentDifficulty = DifficultyHard // По умолчанию hard
+var currentDifficulty = DifficultyEasy // По умолчанию hard
 
 func GetDifficulty() Difficulty {
 	return currentDifficulty

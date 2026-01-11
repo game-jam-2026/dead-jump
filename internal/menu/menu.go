@@ -171,7 +171,7 @@ func (m *Menu) initEpilogueItems() {
 
 func (m *Menu) initDifficultyItems() {
 	m.difficultyItems = []MenuItem{
-		{Text: "EASY", Action: func() {
+		{Text: "NORMAL", Action: func() {
 			game.SetDifficulty(game.DifficultyEasy)
 			if m.OnStartGame != nil {
 				m.OnStartGame()
