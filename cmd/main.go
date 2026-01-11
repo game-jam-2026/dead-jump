@@ -85,7 +85,7 @@ func (g *Game) Update() error {
 
 	// Update based on state
 	switch state {
-	case menu.StateMenu, menu.StatePaused, menu.StateConfirmRestart, menu.StateSettings, menu.StateLevelComplete, menu.StateGameOver, menu.StateEpilogueEnding:
+	case menu.StateMenu, menu.StatePaused, menu.StateConfirmRestart, menu.StateSettings, menu.StateLevelComplete, menu.StateGameOver, menu.StateEpilogueEnding, menu.StateDifficultySelect:
 		g.menu.Update()
 	case menu.StatePlaying:
 		if g.w != nil {
@@ -175,7 +175,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	state := g.menu.GetState()
 
 	switch state {
-	case menu.StateMenu:
+	case menu.StateMenu, menu.StateDifficultySelect:
 		g.menu.Draw(screen)
 	case menu.StatePlaying:
 		if g.w != nil {

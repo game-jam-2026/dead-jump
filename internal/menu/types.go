@@ -55,6 +55,7 @@ const (
 	StateLevelComplete
 	StateGameOver
 	StateEpilogueEnding
+	StateDifficultySelect
 )
 
 type SubtitlePhase int
@@ -146,8 +147,9 @@ type Menu struct {
 	levelCompleteItems []MenuItem
 	gameOverItems      []MenuItem
 
-	epilogueItems []MenuItem
-	epilogueTimer int
+	epilogueItems   []MenuItem
+	epilogueTimer   int
+	difficultyItems []MenuItem
 
 	// Callbacks
 	OnStartGame        func()
